@@ -1,0 +1,15 @@
+Copyright (c) 2026 The Runners Playground. All rights reserved.
+
+This repository and everything in it (including the website design,
+source code, text, graphics, logo and course data) is the property of
+The Runners Playground.
+
+You may view this website in your browser and use its tools for your own
+personal running. You may NOT copy, reproduce, modify, publish, host,
+distribute or sell this code, design or content, in whole or in part,
+or use the name or logo of The Runners Playground, without prior written
+permission.
+
+No licence is granted by making this repository publicly visible.
+
+For permission requests, contact The Runners Playground.

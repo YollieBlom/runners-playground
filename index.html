@@ -109,7 +109,10 @@ details.card[open] .more{display:none}
 details.card .body{padding:0 26px 26px}
 .weeks{margin:0;padding-left:20px}
 .weeks li{margin-bottom:6px}
-.thumb{height:150px;border-bottom:var(--line);display:flex;align-items:center;justify-content:center;border-radius:23px 23px 0 0}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:23px 23px 0 0}
+.post-body p{margin:0 0 12px}.post-body ul{margin:0 0 12px;padding-left:20px}
+.post-date{font-size:14px;font-weight:700;color:var(--slate)}
+.thumb{height:150px;overflow:hidden;border-bottom:var(--line);display:flex;align-items:center;justify-content:center;border-radius:23px 23px 0 0}
 /* pricing */
 .price{display:flex;flex-direction:column;gap:14px}
 .price .amt{font:700 46px/1 'Fredoka',sans-serif;white-space:nowrap}
@@ -180,6 +183,7 @@ footer a{color:#fff}
   <nav class="menu" id="menu" aria-label="Main">
    <a href="#calculators">Calculators</a>
    <a href="#diary">Run Diary</a>
+   <a data-link="pacer" href="#">Race Pacers</a>
    <a href="#challenges">Challenges</a>
    <a href="#badges">Badges</a>
    <a href="#plans">Training plans</a>
@@ -296,6 +300,7 @@ footer a{color:#fff}
   </div>
 
   <div class="tools">
+   <a class="tool" data-link="pacer" href="#" style="background:var(--ye)"><span class="ico" style="background:#fff"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></span><span><b>Race pacers</b>Westvaal 10 km & more: plan, splits, leaderboard</span></a>
    <a class="tool" data-link="kaapsehoop" href="#" style="background:var(--tq-l)"><span class="ico" style="background:var(--tq)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 20 9 9l4 6 3-4 5 9z"/></svg></span><span><b>Kaapsehoop pacing simulator</b>Plan the climbs</span></a>
    <a class="tool" data-link="mataffin" href="#" style="background:var(--pk-l)"><span class="ico" style="background:var(--pk)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><span><b>Mataffin pace estimator</b>Your goal, your splits</span></a>
    <a class="tool" data-link="runDiary" href="#" style="background:var(--ye-l)"><span class="ico" style="background:var(--ye)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span><span><b>Run Diary &amp; Pace Matchmaker</b>Log runs, find a buddy</span></a>
@@ -438,8 +443,10 @@ footer a{color:#fff}
 <section id="blog" class="band" style="background:var(--tq-l)">
  <div class="wrap">
   <span class="eyebrow">Tips &amp; tricks</span>
-  <h2 style="margin-bottom:36px">Trail talk</h2>
+  <h2 style="margin-bottom:20px">Trail talk</h2>
+  <div class="chips" id="post-cats" style="margin-bottom:24px"></div>
   <div class="grid" id="post-list"></div>
+  <div style="text-align:center;margin-top:28px"><button type="button" class="btn" id="post-more" hidden>Show more articles</button></div>
  </div>
 </section>
 
@@ -486,6 +493,7 @@ footer a{color:#fff}
    <span style="font:700 22px 'Fredoka',sans-serif">The Runners <span style="color:var(--pk)">Playground</span></span>
    <nav aria-label="Footer"><a href="#calculators">Calculators</a><a href="#challenges">Challenges</a><a href="#badges">Badges</a><a href="#plans">Plans</a><a href="#blog">Tips</a><a href="#pricing">Pricing</a></nav>
   </div>
+  <p style="margin:20px 0 0;font-size:14px;color:#CFE3F2">© 2026 The Runners Playground. All rights reserved.</p>
  </div>
 </footer>
 
@@ -494,14 +502,16 @@ footer a{color:#fff}
 /* ===== YOUR LINKS: paste your own addresses between the quotes ===== */
 const LINKS = {
   runDiary:   "",  // Run Diary & Pace Matchmaker (GitHub Pages)
-  mataffin:   "",  // Mataffin pace estimator
-  kaapsehoop: "",  // Kaapsehoop pacing simulator
+  mataffin:   "https://yollieblom.github.io/Mataffin-pace/",    // Mataffin pace estimator
+  kaapsehoop: "https://yollieblom.github.io/kaapsehoop-4-in-1-marathon/",  // Kaapsehoop pacing simulator
+  pacer:      "https://yollieblom.github.io/race-pacer/",       // Race pacers for every race (Westvaal and more)
   signup:     "",  // Google Form for sign-ups / Pro waitlist
-  clubs:      ""   // Google Form or WhatsApp link for clubs
+  clubs:      "",  // Google Form or WhatsApp link for clubs
+  sheet:      ""   // your Google Apps Script web app URL (same one as the leaderboard): blog articles come from here
 };
 document.querySelectorAll('[data-link]').forEach(a => {
   const url = LINKS[a.dataset.link];
-  if (url) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+  if (url) { a.href = url; if (!url.includes('yollieblom.github.io')) { a.target = '_blank'; a.rel = 'noopener'; } }
   else a.addEventListener('click', e => { e.preventDefault(); a.textContent = 'Link coming soon'; });
 });
 
@@ -528,7 +538,7 @@ tabs.forEach((t, i) => {
 const savedTab = store.get('tab'); if (savedTab && $(savedTab)) showTab($(savedTab));
 
 /* distance chips */
-document.querySelectorAll('.chips').forEach(box => {
+document.querySelectorAll('.chips[data-for]').forEach(box => {
   const input = $(box.dataset.for);
   box.innerHTML = DISTS.map(([v, l]) => `<button type="button" class="chip" data-v="${v}">${l}</button>`).join('');
   const mark = () => box.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', parseFloat(c.dataset.v) === parseFloat(input.value)));
@@ -579,7 +589,7 @@ Object.entries(groups).forEach(([g, ids]) => {
   ids.forEach(id => $(id).addEventListener('change', () => runs[g]()));
   runs[g]();
 });
-document.querySelectorAll('.chips').forEach(b => b.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', parseFloat(c.dataset.v) === parseFloat($(b.dataset.for).value))));
+document.querySelectorAll('.chips[data-for]').forEach(b => b.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', parseFloat(c.dataset.v) === parseFloat($(b.dataset.for).value))));
 
 /* challenges */
 const CHALLENGES = [
@@ -630,17 +640,7 @@ $('plan-list').innerHTML = PLANS.map(([tag, bg, n, meta, weeks]) => `
    <div class="body"><ul class="weeks">${weeks.map(w => `<li>${w}</li>`).join('')}</ul></div>
   </details>`).join('');
 
-/* tips */
-const POSTS = [
-  ['Pacing', '#2EC4B6', 'Why your easy runs should feel too easy', 'Easy runs build your engine without wrecking your legs. If you can chat in full sentences, you are at the right pace. Most runners go too fast on easy days and too slow on hard days. Slow down on easy days and your hard days get better.'],
-  ['Race day', '#FFD23F', 'Your night-before race checklist', 'Lay out your kit, pin your number, charge your watch and set two alarms. Eat a familiar dinner, nothing new. Plan how you get to the start and arrive with 45 minutes to spare. Nothing new on race day: no new shoes, gels or breakfast.'],
-  ['Hills', '#FF5C8A', 'Make friends with hills', 'Going up: shorten your stride, lean slightly from the ankles and drive your arms. Aim for even effort, not even pace. Going down: relax, let gravity help and keep your feet under you. Walking the steepest bits is smart, not cheating.']
-];
-$('post-list').innerHTML = POSTS.map(([cat, c, t, body]) => `
-  <details class="card">
-   <summary><div class="thumb" style="background:${c};margin:-26px -26px 10px" aria-hidden="true"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4" r="2"/><path d="M8 21l3-6 3 2 1 4M10 13l-2-2 4-4 3 3 3 1M6 12l2-2"/></svg></div><span class="eyebrow" style="margin:0;color:var(--pk-d)">${cat}</span><h3 style="font-size:24px">${t}</h3><span class="more">Read the tip →</span></summary>
-   <div class="body"><p style="margin:0">${body}</p></div>
-  </details>`).join('');
+window.TRP_SHEET = LINKS.sheet;
 }
 </script>
 <script>
@@ -872,6 +872,50 @@ const draw = () => {
   svg.innerHTML = grid + labels + line('pace', '#FF5C8A') + line('eff', '#0B7A70');
 };
 const ro = new ResizeObserver(draw); ro.observe(chartBox);
+}
+</script>
+<script>
+{
+/* ===== BLOG: articles come from the "Blog" tab of your Google Sheet ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SWATCH = { turquoise: '#2EC4B6', yellow: '#FFD23F', pink: '#FF5C8A' }, CYCLE = ['#2EC4B6', '#FFD23F', '#FF5C8A'];
+/* shown until the sheet is connected, or if it can't be reached */
+const STARTER = [
+  { category: 'Pacing', color: 'turquoise', title: 'Why your easy runs should feel too easy', summary: 'Slow down on easy days and your hard days get better.', body: 'Easy runs build your engine without wrecking your legs. If you can chat in full sentences, you are at the right pace.\n\nMost runners go too fast on easy days and too slow on hard days. Slow down on easy days and your hard days get better.' },
+  { category: 'Race day', color: 'yellow', title: 'Your night-before race checklist', summary: 'Kit, fuel, alarm, repeat.', body: '- Lay out your kit and pin your number\n- Charge your watch and set two alarms\n- Eat a familiar dinner, nothing new\n- Plan how you get to the start and arrive 45 minutes early\n\nNothing new on race day: no new shoes, gels or breakfast.' },
+  { category: 'Hills', color: 'pink', title: 'Make friends with hills', summary: 'Simple form tips for strong climbs and safe descents.', body: 'Going up: shorten your stride, lean slightly from the ankles and drive your arms. Aim for even effort, not even pace.\n\nGoing down: relax, let gravity help and keep your feet under you. Walking the steepest bits is smart, not cheating.' }
+];
+let posts = STARTER, cat = '', shown = 6;
+const bodyHtml = txt => String(txt || '').replace(/\r/g, '').split(/\n\s*\n/).map(block => {
+  const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length && lines.every(l => /^[-•*]\s+/.test(l))) return '<ul>' + lines.map(l => '<li>' + esc(l.replace(/^[-•*]\s+/, '')) + '</li>').join('') + '</ul>';
+  return '<p>' + lines.map(esc).join('<br>') + '</p>';
+}).join('');
+const safeImg = u => /^https:\/\/[^\s"'<>]+$/i.test(String(u || '').trim()) ? String(u).trim() : '';
+const niceDate = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' }); };
+const render = () => {
+  const cats = [...new Set(posts.map(p => String(p.category || '').trim()).filter(Boolean))];
+  $('post-cats').innerHTML = cats.length > 1 ? [''].concat(cats).map(c => `<button type="button" class="chip${c === cat ? ' on' : ''}" data-cat="${esc(c)}">${esc(c || 'All')}</button>`).join('') : '';
+  const list = posts.filter(p => !cat || String(p.category || '').trim() === cat);
+  $('post-list').innerHTML = list.slice(0, shown).map((p, i) => {
+    const col = SWATCH[String(p.color || '').toLowerCase()] || (/^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : CYCLE[i % 3]);
+    const img = safeImg(p.image);
+    const pic = img ? `<img src="${esc(img)}" alt="" loading="lazy">` : '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4" r="2"/><path d="M8 21l3-6 3 2 1 4M10 13l-2-2 4-4 3 3 3 1M6 12l2-2"/></svg>';
+    return `<details class="card">
+   <summary><div class="thumb" style="background:${col};margin:-26px -26px 10px" aria-hidden="true">${pic}</div><span class="eyebrow" style="margin:0;color:var(--pk-d)">${esc(p.category)}</span><h3 style="font-size:24px">${esc(p.title)}</h3>${p.date ? `<span class="post-date">${esc(niceDate(p.date))}</span>` : ''}${p.summary ? `<span>${esc(p.summary)}</span>` : ''}<span class="more">Read the article →</span></summary>
+   <div class="body post-body">${bodyHtml(p.body)}</div>
+  </details>`;
+  }).join('') || '<p>No articles in this category yet.</p>';
+  $('post-more').hidden = list.length <= shown;
+};
+$('post-cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (!b) return; cat = b.dataset.cat; shown = 6; render(); });
+$('post-more').addEventListener('click', () => { shown += 6; render(); });
+render();
+const url = window.TRP_SHEET;
+if (url) fetch(url + (url.includes('?') ? '&' : '?') + 'action=posts').then(r => r.json()).then(j => {
+  if (j && Array.isArray(j.posts) && j.posts.length) { posts = j.posts; render(); }
+}).catch(() => { /* keep the starter articles */ });
 }
 </script>
 </body>
