@@ -162,6 +162,31 @@ footer a{color:#fff}
 .src.who{grid-template-columns:repeat(2,minmax(0,1fr));max-width:420px;margin-top:16px}
 .d-hi{margin:4px 0 0;font-weight:800;color:var(--tq-d)}
 @media(max-width:600px){.log th:nth-child(4),.log td:nth-child(4){display:none}}
+/* ---------- pages + bottom bar ---------- */
+.gopro{min-height:40px;padding:8px 18px;font-size:15px;box-shadow:3px 3px 0 var(--ink)}
+.menu a[aria-current=page]{background:var(--tq-l)}
+.hero .wrap.home{display:flex;position:relative;min-height:calc(100svh - 76px - 78px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0}
+.home > *{position:relative}
+.home .blob{position:absolute}
+.feature{display:flex;align-items:center;gap:16px;width:min(100%,460px);background:var(--ye);border:var(--line);border-radius:28px;padding:18px 20px;box-shadow:7px 7px 0 var(--ink);text-decoration:none;color:var(--ink);transition:transform .12s,box-shadow .12s}
+.feature:hover,.feature:active{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink)}
+.f-ico{flex:none;width:60px;height:60px;border:var(--line);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center}
+.f-txt{flex:1;display:flex;flex-direction:column;line-height:1.25}
+.f-txt small{font-weight:800;font-size:14px;color:var(--pk-d);text-transform:uppercase;letter-spacing:.04em}
+.f-txt b{font:700 28px/1.1 'Fredoka',sans-serif}
+.f-txt span{font-weight:700;font-size:16px}
+.f-go{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;font:800 22px/44px 'Nunito',sans-serif;text-align:center}
+.home-more{font-size:16px !important;margin:26px 0 0 !important}
+.home-more .d{display:none}
+@media(min-width:901px){.hero .wrap.home{align-items:center;text-align:center}.hero .wrap.home p{margin-left:auto;margin-right:auto}.home-more .m{display:none}.home-more .d{display:inline}}
+.tabbar{display:none}
+@media(max-width:900px){
+ .menu{display:none}
+ .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+ .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:16px;text-decoration:none;color:var(--slate);font:800 13px 'Nunito',sans-serif}
+ .tabbar a[aria-current=page]{background:var(--tq);color:var(--ink);border:2px solid var(--ink)}
+ body{padding-bottom:84px}
+}
 /* ---------- blog: cards ---------- */
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .blog-search{display:flex;align-items:center;gap:8px;background:#fff;border:var(--line);border-radius:999px;padding:6px 16px;min-height:48px;width:min(100%,320px)}
@@ -255,56 +280,35 @@ body.reading{overflow:hidden}
 -->
 <header>
  <div class="nav">
-  <a class="logo" href="#top" aria-label="The Runners Playground home">
+  <a class="logo" href="#home" aria-label="The Runners Playground home">
    <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="3" y="9" width="38" height="26" rx="13" fill="none" stroke="#2EC4B6" stroke-width="5"/><rect x="11" y="16" width="22" height="12" rx="6" fill="#FFD23F" stroke="#0F2236" stroke-width="2.5"/><circle cx="34" cy="10" r="5" fill="#FF5C8A" stroke="#0F2236" stroke-width="2.5"/></svg>
    <span>The Runners<br><span>Playground</span></span>
   </a>
-  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
-   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-  </button>
-  <nav class="menu" id="menu" aria-label="Main">
-   <a href="#calculators">Calculators</a>
-   <a href="#diary">Run Diary</a>
-   <a data-link="pacer" href="#">Race Pacers</a>
-   <a href="#challenges">Challenges</a>
-   <a href="#badges">Badges</a>
-   <a href="#plans">Training plans</a>
-   <a href="#blog">Tips</a>
-   <a href="#pricing">Pricing</a>
-   <a class="btn pink" href="#join">Join free</a>
+  <nav class="menu" aria-label="Main">
+   <a href="#home" data-nav="home">Home</a>
+   <a href="#tools" data-nav="tools">Tools</a>
+   <a href="#diary" data-nav="diary">Diary</a>
+   <a href="#play" data-nav="play">Play</a>
+   <a href="#tips" data-nav="tips">Tips</a>
   </nav>
+  <a class="btn pink gopro" href="#pro" data-nav="pro">Go Pro</a>
  </div>
 </header>
 
 <main>
 <section id="top" class="hero band">
- <div class="wrap">
-  <div>
-   <span class="pill" style="background:var(--ye)">Your running playground</span>
-   <h1>Run. Play.<br><mark>Brag about it.</mark></h1>
-   <p>Crunch your paces, take on community challenges, collect badges and follow a plan built for your next race. Running, but make it fun.</p>
-   <div style="display:flex;flex-wrap:wrap;gap:14px">
-    <a class="btn dark" href="#challenges">Start a challenge</a>
-    <a class="btn" href="#calculators">Try the calculators</a>
-   </div>
-  </div>
-  <div class="hero-art">
-   <div class="blob" style="top:0;right:24px;width:110px;height:110px;border-radius:50%;background:var(--ye)"></div>
-   <div class="blob" style="bottom:0;left:16px;width:76px;height:76px;border-radius:22px;background:var(--pk);transform:rotate(14deg)"></div>
-   <div class="card challenge-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-     <span class="eyebrow" style="margin:0">Challenge of the month</span>
-     <span class="pill" style="background:var(--ye);font-size:13px">LIVE</span>
-    </div>
-    <h3 style="font-size:32px">Distance Dash</h3>
-    <p style="margin:6px 0 18px;font-size:16px;font-weight:600">Log every km this month and climb the leaderboard.</p>
-    <div class="bar" role="img" aria-label="Community progress towards this month's goal"><i style="width:62%"></i></div>
-    <p style="margin:14px 0 0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px">
-     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>
-     Finish to unlock the Dash Master badge
-    </p>
-   </div>
-  </div>
+ <div class="wrap home">
+  <div class="blob" style="bottom:20%;right:-30px;width:90px;height:90px;border-radius:50%;background:var(--ye)" aria-hidden="true"></div>
+  <div class="blob" style="top:7%;right:7%;width:54px;height:54px;border-radius:18px;background:var(--pk);transform:rotate(14deg)" aria-hidden="true"></div>
+  <span class="pill" style="background:var(--ye)" id="hello">Howzit, runner!</span>
+  <h1>Run. Play.<br><mark>Brag about it.</mark></h1>
+  <p>Your next race, paced to the second.</p>
+  <a class="feature" data-link="nextRace" href="#">
+   <span class="f-ico" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
+   <span class="f-txt"><small id="nr-when">Next race</small><b>Race Pacer</b><span id="nr-name">Plan your splits</span></span>
+   <span class="f-go" aria-hidden="true">→</span>
+  </a>
+  <p class="home-more"><span class="m">Or tap the menu below to explore.</span><span class="d">Or pick a page from the menu at the top.</span></p>
  </div>
 </section>
 
@@ -570,9 +574,9 @@ body.reading{overflow:hidden}
 </section>
 </main>
 
-<footer id="join">
+<footer>
  <div class="wrap" style="padding-bottom:40px">
-  <div class="join">
+  <div class="join" id="join">
    <div style="flex:1 1 380px">
     <h2 style="font-size:clamp(34px,4.5vw,46px);margin-bottom:8px">Ready to play?</h2>
     <p style="margin:0;font-size:18px;font-weight:600">Sign up free to join challenges, earn badges and hear about Pro first.</p>
@@ -581,11 +585,18 @@ body.reading{overflow:hidden}
   </div>
   <div class="foot">
    <span style="font:700 22px 'Fredoka',sans-serif">The Runners <span style="color:var(--pk)">Playground</span></span>
-   <nav aria-label="Footer"><a href="#calculators">Calculators</a><a href="#challenges">Challenges</a><a href="#badges">Badges</a><a href="#plans">Plans</a><a href="#blog">Tips</a><a href="#pricing">Pricing</a></nav>
+   <nav aria-label="Footer"><a href="#tools">Tools</a><a href="#diary">Diary</a><a href="#play">Play</a><a href="#tips">Tips</a><a href="#pro">Pro</a></nav>
   </div>
   <p style="margin:20px 0 0;font-size:14px;color:#CFE3F2">© 2026 The Runners Playground. All rights reserved.</p>
  </div>
 </footer>
+<nav class="tabbar" aria-label="Pages">
+ <a href="#home" data-nav="home"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+ <a href="#tools" data-nav="tools"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h1M12 12h1M16 12h0M8 16h1M12 16h1M15 12v4"/></svg><span>Tools</span></a>
+ <a href="#diary" data-nav="diary"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>Diary</span></a>
+ <a href="#play" data-nav="play"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/></svg><span>Play</span></a>
+ <a href="#tips" data-nav="tips"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg><span>Tips</span></a>
+</nav>
 
 <script>
 {
@@ -595,6 +606,7 @@ const LINKS = {
   mataffin:   "https://yollieblom.github.io/race-pacer/?race=mataffin",    // Mataffin Home Run (past race)
   kaapsehoop: "https://yollieblom.github.io/race-pacer/?race=kaapsehoop",  // Kaapsehoop 4 in 1 Marathon (past race)
   pacer:      "https://yollieblom.github.io/race-pacer/",       // Race pacers for every race (Westvaal and more)
+  nextRace:   "https://yollieblom.github.io/race-pacer/?race=westvaal",  // big button on the home page
   signup:     "",  // Google Form for sign-ups / Pro waitlist
   clubs:      "",  // Google Form or WhatsApp link for clubs
   sheet:      "https://script.google.com/macros/s/AKfycbwigsHxdzNvrx1_YdehnBkAiUMumAELNk_nWtRYYV42exLESbKCPsqdnN6p1ctjxSd7/exec"   // your Google Apps Script web app URL (same one as the leaderboard): blog articles come from here
@@ -605,10 +617,9 @@ document.querySelectorAll('[data-link]').forEach(a => {
   else a.addEventListener('click', e => { e.preventDefault(); a.textContent = 'Link coming soon'; });
 });
 
-/* menu */
-const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
-menuBtn.addEventListener('click', () => { const o = menu.classList.toggle('open'); menuBtn.setAttribute('aria-expanded', o); });
-menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { menu.classList.remove('open'); menuBtn.setAttribute('aria-expanded', false); }));
+/* ===== NEXT RACE on the home page: change these when a new race comes up ===== */
+const NEXT_RACE = { name: "Westvaal", date: "2026-12-05" };
+window.NEXT_RACE_INFO = NEXT_RACE;
 
 /* helpers */
 const $ = id => document.getElementById(id);
@@ -1194,6 +1205,38 @@ const url = window.TRP_SHEET;
 if (url) fetch(url + (url.includes('?') ? '&' : '?') + 'action=posts').then(r => r.json()).then(j => {
   if (j && Array.isArray(j.posts) && j.posts.length) { posts = j.posts; front(); if (/^#read-/.test(location.hash)) fromHash(); }
 }).catch(() => { /* keep the starter articles */ });
+}
+</script>
+<script>
+{
+/* ===== PAGES: each bottom-bar button shows one page ===== */
+const PAGES = { home: ['top'], tools: ['calculators'], diary: ['diary'], play: ['challenges', 'badges'], tips: ['plans', 'blog'], pro: ['pricing', 'join'] };
+const pageOf = id => { if (PAGES[id]) return id; if (/^read-/.test(id)) return 'tips'; for (const k in PAGES) if (PAGES[k].includes(id)) return k; return 'home'; };
+let shown = null;
+const go = () => {
+  const id = decodeURIComponent(location.hash.slice(1)), page = pageOf(id);
+  document.querySelectorAll('main > section').forEach(sec => { sec.hidden = !PAGES[page].includes(sec.id); });
+  document.getElementById('join').hidden = page !== 'pro';
+  document.querySelectorAll('[data-nav]').forEach(a => { if (a.dataset.nav === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  const el = !PAGES[id] && document.getElementById(id);
+  if (el && PAGES[page].indexOf(id) > 0) el.scrollIntoView();
+  else if (page !== shown && !/^read-/.test(id)) window.scrollTo(0, 0);
+  shown = page;
+  window.dispatchEvent(new Event('resize')); /* lets charts size themselves on a newly shown page */
+};
+window.addEventListener('hashchange', go); window.addEventListener('popstate', go); go();
+
+/* greeting + next race countdown */
+const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+let name = ''; try { const u = Object.values(JSON.parse(localStorage.getItem('trp-diaries-v2')) || {}); if (u.length === 1) name = u[0].name; } catch (e) {}
+document.getElementById('hello').textContent = part + ', ' + (name || 'runner') + '!';
+const r = window.NEXT_RACE_INFO;
+if (r && r.name) {
+  const d = new Date(r.date + 'T00:00:00'), t = new Date(); t.setHours(0, 0, 0, 0);
+  const days = Math.round((d - t) / 864e5);
+  document.getElementById('nr-name').textContent = r.name + ' · ' + ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ' ' + d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
+  document.getElementById('nr-when').textContent = days > 1 ? days + ' days to go' : days === 1 ? 'Tomorrow!' : days === 0 ? 'Race day!' : 'Next race';
+}
 }
 </script>
 </body>
