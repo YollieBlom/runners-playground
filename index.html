@@ -159,6 +159,8 @@ footer a{color:#fff}
 .key i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
 .pin{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
 .pin .field{flex:1 1 160px;margin:0}
+.src.who{grid-template-columns:repeat(2,minmax(0,1fr));max-width:420px;margin-top:16px}
+.d-hi{margin:4px 0 0;font-weight:800;color:var(--tq-d)}
 @media(max-width:600px){.log th:nth-child(4),.log td:nth-child(4){display:none}}
 /* ---------- blog: cards ---------- */
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -446,20 +448,27 @@ body.reading{overflow:hidden}
 
   <div class="panel log" id="diary-panel">
    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
-    <h3>My private diary</h3>
+    <div><h3>My private diary</h3><p class="d-hi" id="d-hi" hidden></p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="diary-tools" hidden>
      <button type="button" class="mini" id="d-csv" style="background:var(--tq-l)">Copy as CSV</button>
      <button type="button" class="mini" id="d-lock" style="background:#fff">Lock</button>
     </div>
    </div>
    <div id="d-locked">
-    <p id="d-msg" style="margin:8px 0 14px">Your runs are saved on this device only, locked with a PIN. Nobody else can see them.</p>
+    <div class="src who" role="group" aria-label="Who are you?">
+     <button type="button" id="d-new" aria-pressed="false">New user</button>
+     <button type="button" id="d-old" aria-pressed="true">Existing user</button>
+    </div>
+    <p id="d-msg" style="margin:0 0 14px">Your runs are saved on this device only, locked with your PIN. Nobody else can see them.</p>
     <div class="pin">
+     <label class="field">Username<input id="d-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24" list="d-users"></label>
+     <datalist id="d-users"></datalist>
      <label class="field">PIN (4 to 8 digits)<input id="d-pin" type="password" inputmode="numeric" autocomplete="off" minlength="4" maxlength="8"></label>
+     <label class="field" id="d-pin2-wrap" hidden>Type your PIN again<input id="d-pin2" type="password" inputmode="numeric" autocomplete="off" minlength="4" maxlength="8"></label>
      <button type="button" class="btn dark" id="d-go">Open diary</button>
     </div>
     <p class="status err" id="d-err" aria-live="polite"></p>
-    <button type="button" id="d-reset" hidden style="background:none;border:0;color:var(--pk-d);font:700 14px 'Nunito',sans-serif;text-decoration:underline;cursor:pointer;padding:8px 0">Forgot PIN? Start a new diary (deletes saved runs)</button>
+    <button type="button" id="d-reset" hidden style="background:none;border:0;color:var(--pk-d);font:700 14px 'Nunito',sans-serif;text-decoration:underline;cursor:pointer;padding:8px 0">Forgot PIN? Start this diary again (deletes its saved runs)</button>
    </div>
    <div id="d-open" hidden>
     <div class="chart" id="d-chart"><svg role="img" aria-label="Actual pace and heat-adjusted effort pace over time"></svg></div>
@@ -875,53 +884,87 @@ $('pic-file').addEventListener('change', async e => {
   } catch (err) { status((err.message || 'Could not read that picture.') + ' Try a clearer screenshot, or type it in.', true); }
 });
 
-/* --- private diary: encrypted with your PIN, stored on this device --- */
-const KEY = 'trp-diary-v1';
-let cryptoKey = null, saltB = null, runs = [];
+/* --- private diary: one per username, encrypted with that user's PIN, stored on this device --- */
+const KEY = 'trp-diaries-v2', OLD_KEY = 'trp-diary-v1';
+let cryptoKey = null, saltB = null, runs = [], who = null, mode = 'old';
 const b64 = u => btoa(String.fromCharCode(...new Uint8Array(u)));
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-const readStore = () => { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } };
+const readAll = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
+const writeAll = all => { try { localStorage.setItem(KEY, JSON.stringify(all)); return true; } catch (e) { alertMsg('Could not save on this device.'); return false; } };
+const readOld = () => { try { return JSON.parse(localStorage.getItem(OLD_KEY)); } catch (e) { return null; } };
+const idOf = n => n.trim().toLowerCase();
 const derive = async (pin, salt) => { const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']); };
-const persist = async () => { const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cryptoKey, new TextEncoder().encode(JSON.stringify(runs))); try { localStorage.setItem(KEY, JSON.stringify({ salt: b64(saltB), iv: b64(iv), data: b64(ct) })); } catch (e) { alertMsg('Could not save on this device.'); } };
-const alertMsg = m => { $('d-err').textContent = m; };
-const setLockedUI = () => {
-  const has = !!readStore();
-  $('d-msg').textContent = has ? 'Enter your PIN to open your diary.' : 'Choose a PIN to start your diary. Runs are saved on this device only, locked with your PIN.';
-  $('d-go').textContent = has ? 'Open diary' : 'Create diary';
-  $('d-reset').hidden = !has;
+const persist = async () => {
+  if (!who) return;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cryptoKey, new TextEncoder().encode(JSON.stringify(runs)));
+  const all = readAll(); all[who.id] = { name: who.name, salt: b64(saltB), iv: b64(iv), data: b64(ct) }; writeAll(all);
 };
-setLockedUI();
+const alertMsg = m => { $('d-err').textContent = m; };
+const fillUsers = () => { $('d-users').innerHTML = Object.values(readAll()).map(u => '<option value="' + String(u.name).replace(/[&<>"]/g, c => '&#' + c.charCodeAt(0) + ';') + '">').join(''); };
+const setMode = m => {
+  mode = m; resetArmed = false;
+  $('d-new').setAttribute('aria-pressed', m === 'new'); $('d-old').setAttribute('aria-pressed', m === 'old');
+  $('d-pin2-wrap').hidden = m !== 'new';
+  $('d-msg').textContent = m === 'new'
+    ? 'Pick a username and a PIN to start your diary. Your runs are saved on this device only, locked with your PIN.'
+    : 'Enter your username and PIN to open your diary.';
+  $('d-go').textContent = m === 'new' ? 'Create diary' : 'Open diary';
+  $('d-reset').hidden = m !== 'old' || (!Object.keys(readAll()).length && !readOld());
+  $('d-reset').textContent = 'Forgot PIN? Start this diary again (deletes its saved runs)';
+  alertMsg('');
+};
+const setLockedUI = () => { fillUsers(); setMode(Object.keys(readAll()).length || readOld() ? 'old' : 'new'); };
+$('d-new').addEventListener('click', () => setMode('new'));
+$('d-old').addEventListener('click', () => setMode('old'));
 const openDiary = async () => {
+  const name = $('d-user').value.trim().replace(/\s+/g, ' '), id = idOf(name);
   const pin = $('d-pin').value.trim();
-  if (!/^\d{4,8}$/.test(pin)) { alertMsg('Use 4 to 8 numbers.'); return; }
+  if (name.length < 2) { alertMsg('Type a username (at least 2 letters).'); $('d-user').focus(); return; }
+  if (!/^\d{4,8}$/.test(pin)) { alertMsg('Your PIN must be 4 to 8 numbers.'); return; }
   if (!window.crypto?.subtle) { alertMsg('This browser cannot lock the diary. Try Chrome or Safari.'); return; }
-  const st = readStore();
+  const all = readAll(), mine = all[id];
   try {
-    if (st) {
-      saltB = unb64(st.salt); cryptoKey = await derive(pin, saltB);
-      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(st.iv) }, cryptoKey, unb64(st.data));
-      runs = JSON.parse(new TextDecoder().decode(pt));
+    if (mode === 'new') {
+      if (mine) { alertMsg('That username already has a diary on this phone. Tap "Existing user", or pick another name.'); return; }
+      if (pin !== $('d-pin2').value.trim()) { alertMsg('The two PINs don\'t match. Try again.'); return; }
+      who = { id, name }; saltB = crypto.getRandomValues(new Uint8Array(16)); cryptoKey = await derive(pin, saltB); runs = []; await persist();
+    } else if (mine) {
+      saltB = unb64(mine.salt); cryptoKey = await derive(pin, saltB);
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(mine.iv) }, cryptoKey, unb64(mine.data));
+      runs = JSON.parse(new TextDecoder().decode(pt)); who = { id, name: mine.name };
     } else {
-      saltB = crypto.getRandomValues(new Uint8Array(16)); cryptoKey = await derive(pin, saltB); runs = []; await persist();
+      const old = readOld();
+      if (!old) { alertMsg('No diary for "' + name + '" on this phone. Check the spelling, or tap "New user".'); return; }
+      /* diary made before usernames existed: open it with the old PIN and move it to this username */
+      saltB = unb64(old.salt); cryptoKey = await derive(pin, saltB);
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(old.iv) }, cryptoKey, unb64(old.data));
+      runs = JSON.parse(new TextDecoder().decode(pt)); who = { id, name };
+      await persist(); try { localStorage.removeItem(OLD_KEY); } catch (e) {}
     }
-  } catch (e) { cryptoKey = null; alertMsg('Wrong PIN. Try again.'); return; }
-  $('d-pin').value = ''; alertMsg('');
+  } catch (e) { cryptoKey = null; who = null; alertMsg('Wrong username or PIN. Try again.'); return; }
+  $('d-pin').value = ''; $('d-pin2').value = ''; alertMsg('');
+  $('d-hi').textContent = 'Hi, ' + who.name + '!'; $('d-hi').hidden = false;
   $('d-locked').hidden = true; $('d-open').hidden = false; $('diary-tools').hidden = false;
   render();
 };
 $('d-go').addEventListener('click', openDiary);
-$('d-pin').addEventListener('keydown', e => { if (e.key === 'Enter') openDiary(); });
-$('d-lock').addEventListener('click', () => { cryptoKey = null; runs = []; $('d-open').hidden = true; $('diary-tools').hidden = true; $('d-locked').hidden = false; setLockedUI(); });
+['d-user', 'd-pin', 'd-pin2'].forEach(f => $(f).addEventListener('keydown', e => { if (e.key === 'Enter') openDiary(); }));
+$('d-lock').addEventListener('click', () => { cryptoKey = null; runs = []; who = null; $('d-hi').hidden = true; $('d-open').hidden = true; $('diary-tools').hidden = true; $('d-locked').hidden = false; $('d-user').value = ''; setLockedUI(); });
 let resetArmed = false;
 $('d-reset').addEventListener('click', () => {
-  if (!resetArmed) { resetArmed = true; $('d-reset').textContent = 'Tap again to delete all saved runs and start over'; return; }
-  try { localStorage.removeItem(KEY); } catch (e) {}
-  resetArmed = false; $('d-reset').textContent = 'Forgot PIN? Start a new diary (deletes saved runs)'; setLockedUI(); alertMsg('Diary cleared. Choose a new PIN.');
+  const name = $('d-user').value.trim(), id = idOf(name), all = readAll();
+  if (!name) { alertMsg('Type your username first, then tap "Forgot PIN".'); $('d-user').focus(); return; }
+  if (!all[id] && !readOld()) { alertMsg('No diary for "' + name + '" on this phone.'); return; }
+  if (!resetArmed) { resetArmed = true; $('d-reset').textContent = 'Tap again to delete ' + name + '\'s saved runs and start over'; return; }
+  if (all[id]) { delete all[id]; writeAll(all); } else { try { localStorage.removeItem(OLD_KEY); } catch (e) {} }
+  resetArmed = false; fillUsers(); setMode('new'); alertMsg('Diary cleared. Choose a new PIN for ' + name + '.');
 });
+setLockedUI();
 $('h-save').addEventListener('click', async () => {
   calc();
   if (!current) { status('Fill in the run first.', true); return; }
-  if (!cryptoKey) { status('Open your diary below first (enter your PIN), then tap save again.', true); $('diary-panel').scrollIntoView({ behavior: 'smooth' }); $('d-pin').focus({ preventScroll: true }); return; }
+  if (!cryptoKey) { status('Open your diary below first (username and PIN), then tap save again.', true); $('diary-panel').scrollIntoView({ behavior: 'smooth' }); $('d-user').focus({ preventScroll: true }); return; }
   runs.push({ ...current, id: Date.now() });
   runs.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   await persist(); render(); status('Saved to your diary.');
