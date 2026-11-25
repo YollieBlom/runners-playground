@@ -175,11 +175,19 @@ footer a{color:#fff}
 .f-txt small{font-weight:800;font-size:14px;color:var(--pk-d);text-transform:uppercase;letter-spacing:.04em}
 .f-txt b{font:700 28px/1.1 'Fredoka',sans-serif}
 .f-txt span{font-weight:700;font-size:16px}
-.f-go{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;font:800 22px/44px 'Nunito',sans-serif;text-align:center}
+.f-tap{font-style:normal;font-weight:800;font-size:14px;text-decoration:underline;text-underline-offset:3px;margin-top:4px}
+.f-go{flex:none;position:relative;width:48px;height:48px;border-radius:50%;background:var(--ink);color:#fff;font:800 24px/48px 'Nunito',sans-serif;text-align:center}
+.f-go::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid var(--ink);opacity:0}
+@media (prefers-reduced-motion:no-preference){
+ .f-go{animation:nudge 1.6s ease-in-out infinite}
+ .f-go::after{animation:ping 1.6s ease-out infinite}
+ @keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+ @keyframes ping{0%{transform:scale(1);opacity:.7}80%,100%{transform:scale(1.55);opacity:0}}
+}
 .home-more{font-size:16px !important;margin:26px 0 0 !important}
 .home-more .d{display:none}
-footer .wrap:has(#join[hidden]){padding-top:8px}
-footer .wrap:has(#join[hidden]) .foot{margin-top:0;border-top:0}
+footer.slim .wrap{padding-top:28px !important;padding-bottom:28px !important}
+footer.slim .foot{margin-top:0;padding-top:0;border-top:0}
 @media(min-width:901px){.hero .wrap.home{align-items:center;text-align:center}.hero .wrap.home p{margin-left:auto;margin-right:auto}.home-more .m{display:none}.home-more .d{display:inline}}
 .tabbar{display:none}
 @media(max-width:900px){
@@ -259,8 +267,9 @@ body.reading{overflow:hidden}
 .callout b.k{display:block;font:700 18px 'Fredoka',sans-serif;margin-bottom:2px}
 .callout.tip{background:var(--tq-l)}.callout.warning{background:var(--pk-l)}.callout.fact{background:var(--ye-l)}.callout.note{background:#F3F7FB}
 .bignum{display:flex;align-items:center;gap:20px;margin:0 0 28px;padding:20px 24px;background:var(--ink);color:#fff;border-radius:22px;border:3px solid var(--ink)}
-.bignum b{font:700 clamp(46px,7vw,64px)/1 'Fredoka',sans-serif;color:var(--ye);white-space:nowrap}
-.bignum span{font-size:18px;font-weight:700}
+.bignum b{flex:none;font:700 clamp(46px,7vw,64px)/1 'Fredoka',sans-serif;color:var(--ye);white-space:nowrap}
+.bignum span{flex:1 1 0;min-width:0;font-size:18px;font-weight:700}
+@media(max-width:600px){.bignum{flex-direction:column;align-items:flex-start;gap:8px}.bignum span{flex:none}}
 .rd-body figure{margin:30px 0}
 .rd-body figure img{width:100%;border:var(--line);border-radius:22px;display:block;box-shadow:6px 6px 0 var(--tq)}
 .rd-body figcaption{font-size:15px;font-weight:700;color:var(--slate);margin-top:10px;text-align:center}
@@ -307,7 +316,7 @@ body.reading{overflow:hidden}
   <p>Your next race, paced to the second.</p>
   <a class="feature" data-link="nextRace" href="#">
    <span class="f-ico" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0F2236" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
-   <span class="f-txt"><small id="nr-when">Next race</small><b>Race Pacer</b><span id="nr-name">Plan your splits</span></span>
+   <span class="f-txt"><small id="nr-when">Next race</small><b>Race Pacer</b><span id="nr-name">Plan your splits</span><em class="f-tap">Tap to plan your race</em></span>
    <span class="f-go" aria-hidden="true">→</span>
   </a>
   <p class="home-more"><span class="m">Or tap the menu below to explore.</span><span class="d">Or pick a page from the menu at the top.</span></p>
@@ -485,12 +494,6 @@ body.reading{overflow:hidden}
   </div>
 
   <div class="grid" style="margin-top:28px">
-   <div class="card" style="background:var(--pk);border-color:#fff;box-shadow:7px 7px 0 var(--tq)">
-    <span class="pill" style="background:#fff">Opt-in</span>
-    <h3 style="margin:12px 0 8px">Pace Matchmaker</h3>
-    <p style="margin:0 0 16px">Flip one switch when you want company on a long run or tempo session. Find local runners by distance and pace, and switch off anytime.</p>
-    <a class="btn dark" data-link="runDiary" href="#">Find a running buddy</a>
-   </div>
    <div class="card" style="background:var(--tq);border-color:#fff;box-shadow:7px 7px 0 var(--ye)" id="m-card">
     <span class="pill" style="background:#fff">Just for you</span>
     <h3 style="margin:12px 0 8px" id="m-title">My month</h3>
@@ -501,6 +504,12 @@ body.reading{overflow:hidden}
      <div><b id="m-long">–</b><span>longest run</span></div>
      <div><b id="m-streak">0</b><span>week streak</span></div>
     </div>
+   </div>
+   <div class="card" style="background:var(--pk);border-color:#fff;box-shadow:7px 7px 0 var(--tq)">
+    <span class="pill" style="background:#fff">Opt-in</span>
+    <h3 style="margin:12px 0 8px">Pace Matchmaker</h3>
+    <p style="margin:0 0 16px">Flip one switch when you want company on a long run or tempo session. Find local runners by distance and pace, and switch off anytime.</p>
+    <a class="btn dark" data-link="runDiary" href="#">Find a running buddy</a>
    </div>
   </div>
  </div>
@@ -587,7 +596,6 @@ body.reading{overflow:hidden}
   </div>
   <div class="foot">
    <span style="font:700 22px 'Fredoka',sans-serif">The Runners <span style="color:var(--pk)">Playground</span></span>
-   <nav aria-label="Footer"><a href="#tools">Tools</a><a href="#diary">Diary</a><a href="#play">Play</a><a href="#tips">Tips</a><a href="#pro">Pro</a></nav>
   </div>
   <p style="margin:20px 0 0;font-size:14px;color:#CFE3F2">© 2026 The Runners Playground. All rights reserved.</p>
  </div>
@@ -1219,6 +1227,7 @@ const go = () => {
   const id = decodeURIComponent(location.hash.slice(1)), page = pageOf(id);
   document.querySelectorAll('main > section').forEach(sec => { sec.hidden = !PAGES[page].includes(sec.id); });
   document.getElementById('join').hidden = page !== 'pro';
+  document.querySelector('footer').classList.toggle('slim', page !== 'pro');
   document.querySelectorAll('[data-nav]').forEach(a => { if (a.dataset.nav === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   const el = !PAGES[id] && document.getElementById(id);
   if (el && PAGES[page].indexOf(id) > 0) el.scrollIntoView();
