@@ -35,7 +35,7 @@ a{color:var(--ink)}
 .btn.pink{background:var(--pk)}
 .card{background:#fff;border:var(--line);border-radius:26px;padding:26px;box-shadow:7px 7px 0 var(--ink)}
 .grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
-.pill{display:inline-block;padding:5px 14px;border:2px solid var(--ink);border-radius:999px;font-weight:800;font-size:14px}
+.pill{display:inline-block;padding:5px 14px;border:2px solid var(--ink);border-radius:999px;font-weight:800;font-size:14px;color:var(--ink)}
 .head-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:36px}
 /* header */
 header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:var(--line)}
@@ -145,7 +145,7 @@ footer a{color:#fff}
 .meter{height:20px;border:var(--line);border-radius:999px;background:linear-gradient(90deg,#2EC4B6,#FFD23F 45%,#FF5C8A 80%,#B0204F);position:relative;margin:18px 0 6px}
 .meter i{position:absolute;top:-8px;width:6px;height:30px;background:var(--ink);border-radius:3px;transform:translateX(-50%)}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
-.facts div{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:10px 12px}
+.facts div{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:16px;padding:10px 12px}
 .facts b{display:block;font:700 22px 'Fredoka',sans-serif;white-space:nowrap}
 .facts span{font-size:14px;font-weight:700}
 .log{margin-top:28px}
@@ -485,10 +485,16 @@ body.reading{overflow:hidden}
     <p style="margin:0 0 16px">Flip one switch when you want company on a long run or tempo session. Find local runners by distance and pace, and switch off anytime.</p>
     <a class="btn dark" data-link="runDiary" href="#">Find a running buddy</a>
    </div>
-   <div class="card" style="background:var(--tq);border-color:#fff;box-shadow:7px 7px 0 var(--ye)">
-    <span class="pill" style="background:#fff">How the screenshot works</span>
-    <h3 style="margin:12px 0 8px">Snap it, check it, save it</h3>
-    <p style="margin:0">Upload a screenshot of your run summary from Strava, Garmin or your watch app. We read the distance, time and weather from it, and you check the numbers before saving. Nothing is uploaded anywhere: it's read on your phone.</p>
+   <div class="card" style="background:var(--tq);border-color:#fff;box-shadow:7px 7px 0 var(--ye)" id="m-card">
+    <span class="pill" style="background:#fff">Just for you</span>
+    <h3 style="margin:12px 0 8px" id="m-title">My month</h3>
+    <p style="margin:0 0 16px" id="m-msg">Open your diary above to see your running month at a glance.</p>
+    <div class="facts" id="m-facts" hidden style="margin-top:0">
+     <div><b id="m-runs">0</b><span>runs this month</span></div>
+     <div><b id="m-km">0</b><span>km this month</span></div>
+     <div><b id="m-long">–</b><span>longest run</span></div>
+     <div><b id="m-streak">0</b><span>week streak</span></div>
+    </div>
    </div>
   </div>
  </div>
@@ -950,7 +956,7 @@ const openDiary = async () => {
 };
 $('d-go').addEventListener('click', openDiary);
 ['d-user', 'd-pin', 'd-pin2'].forEach(f => $(f).addEventListener('keydown', e => { if (e.key === 'Enter') openDiary(); }));
-$('d-lock').addEventListener('click', () => { cryptoKey = null; runs = []; who = null; $('d-hi').hidden = true; $('d-open').hidden = true; $('diary-tools').hidden = true; $('d-locked').hidden = false; $('d-user').value = ''; setLockedUI(); });
+$('d-lock').addEventListener('click', () => { cryptoKey = null; runs = []; who = null; setTimeout(month); $('d-hi').hidden = true; $('d-open').hidden = true; $('diary-tools').hidden = true; $('d-locked').hidden = false; $('d-user').value = ''; setLockedUI(); });
 let resetArmed = false;
 $('d-reset').addEventListener('click', () => {
   const name = $('d-user').value.trim(), id = idOf(name), all = readAll();
@@ -981,7 +987,27 @@ $('d-csv').addEventListener('click', async () => {
 const render = () => {
   $('d-empty').hidden = runs.length > 0;
   $('d-rows').innerHTML = [...runs].reverse().map(r => `<tr><td>${esc(r.date)}</td><td>${esc(r.km)}</td><td>${fmt(r.pace)}</td><td>${esc(r.temp)}°/${esc(r.rh)}%</td><td>+${esc(r.pct)}%</td><td><b>${fmt(r.eff)}</b></td><td><button type="button" data-del="${esc(r.id)}" aria-label="Delete run on ${esc(r.date)}">✕</button></td></tr>`).join('');
-  draw();
+  draw(); month();
+};
+/* "My month" card: a quick summary from the open diary */
+const month = () => {
+  const open = !!cryptoKey && !$('d-open').hidden;
+  $('m-facts').hidden = !open;
+  if (!open) { $('m-title').textContent = 'My month'; $('m-msg').textContent = 'Open your diary above to see your running month at a glance.'; return; }
+  const now = new Date(), ym = now.toISOString().slice(0, 7);
+  const mine = runs.filter(r => String(r.date).slice(0, 7) === ym), km = mine.reduce((t, r) => t + (parseFloat(r.km) || 0), 0);
+  const longest = mine.reduce((m, r) => Math.max(m, parseFloat(r.km) || 0), 0);
+  const wk = d => { const t = new Date(d + 'T12:00:00'); t.setDate(t.getDate() - (t.getDay() + 6) % 7); return t.toISOString().slice(0, 10); };
+  const weeks = new Set(runs.map(r => wk(r.date)));
+  let streak = 0, c = new Date(wk(now.toISOString().slice(0, 10)) + 'T12:00:00');
+  if (!weeks.has(c.toISOString().slice(0, 10))) c.setDate(c.getDate() - 7); /* this week isn't over yet */
+  while (weeks.has(c.toISOString().slice(0, 10))) { streak++; c.setDate(c.getDate() - 7); }
+  $('m-title').textContent = now.toLocaleDateString('en-ZA', { month: 'long' }) + ' so far';
+  $('m-runs').textContent = mine.length; $('m-km').textContent = km ? km.toFixed(1) : '0';
+  $('m-long').textContent = longest ? longest.toFixed(1) + ' km' : '–'; $('m-streak').textContent = streak;
+  $('m-msg').textContent = !mine.length ? 'No runs saved this month yet. Your first one starts the count!'
+    : streak >= 2 ? 'You\'ve run every week for ' + streak + ' weeks. Keep the streak alive!'
+    : 'Nice work, ' + (who ? who.name : 'runner') + '. Run once a week to start a streak.';
 };
 const chartBox = $('d-chart'), svg = chartBox.querySelector('svg');
 const draw = () => {
