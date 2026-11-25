@@ -197,6 +197,15 @@ footer.slim .foot{margin-top:0;padding-top:0;border-top:0}
  .tabbar a[aria-current=page]{background:var(--tq);color:var(--ink);border:2px solid var(--ink)}
  body{padding-bottom:84px}
 }
+/* ---------- newsletter box ---------- */
+.news{background:var(--pk);color:var(--ink);border:var(--line);border-radius:28px;padding:clamp(20px,4vw,32px);box-shadow:7px 7px 0 var(--ink);margin-top:36px;text-align:left}
+.news h3{font-size:28px;margin:0 0 6px}
+.news p{margin:0 0 16px;font-weight:600}
+.news form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.news .field{flex:1 1 200px;margin:0;color:var(--ink)}
+.news .field input{font-size:18px}
+.news small{display:block;margin-top:12px;font-size:13px;font-weight:700}
+.news .ok{font:700 22px 'Fredoka',sans-serif;margin:0}
 /* ---------- blog: cards ---------- */
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .blog-search{display:flex;align-items:center;gap:8px;background:#fff;border:var(--line);border-radius:999px;padding:6px 16px;min-height:48px;width:min(100%,320px)}
@@ -552,6 +561,17 @@ body.reading{overflow:hidden}
   <div id="post-feature"></div>
   <div class="post-grid" id="post-list"></div>
   <div style="text-align:center;margin-top:28px"><button type="button" class="btn" id="post-more" hidden>Show more articles</button></div>
+  <div class="news" data-news="tips">
+ <h3>Get the Playground Post</h3>
+ <p>Running tips, new race pacers and challenges, about once a month. No spam.</p>
+ <form novalidate>
+  <label class="field">First name<input name="name" type="text" autocomplete="given-name" maxlength="40"></label>
+  <label class="field">Email<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" required></label>
+  <button type="submit" class="btn dark">Sign me up</button>
+ </form>
+ <p class="status err" aria-live="polite" style="margin:10px 0 0"></p>
+ <small>We only use your email for this newsletter. Unsubscribe anytime by replying "unsubscribe".</small>
+</div>
  </div>
 </section>
 
@@ -587,12 +607,18 @@ body.reading{overflow:hidden}
 
 <footer>
  <div class="wrap" style="padding-bottom:40px">
-  <div class="join" id="join">
-   <div style="flex:1 1 380px">
-    <h2 style="font-size:clamp(34px,4.5vw,46px);margin-bottom:8px">Ready to play?</h2>
-    <p style="margin:0;font-size:18px;font-weight:600">Sign up free to join challenges, earn badges and hear about Pro first.</p>
-   </div>
-   <a class="btn pink" data-link="signup" href="#">Sign me up</a>
+  <div id="join">
+<div class="news" style="margin-top:0" data-news="pro">
+ <h3>Ready to play?</h3>
+ <p>Sign up free to hear about challenges, new race pacers and Pro first. About once a month, no spam.</p>
+ <form novalidate>
+  <label class="field">First name<input name="name" type="text" autocomplete="given-name" maxlength="40"></label>
+  <label class="field">Email<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" required></label>
+  <button type="submit" class="btn dark">Sign me up</button>
+ </form>
+ <p class="status err" aria-live="polite" style="margin:10px 0 0"></p>
+ <small>We only use your email for this newsletter. Unsubscribe anytime by replying "unsubscribe".</small>
+</div>
   </div>
   <div class="foot">
    <span style="font:700 22px 'Fredoka',sans-serif">The Runners <span style="color:var(--pk)">Playground</span></span>
@@ -1051,6 +1077,35 @@ const ro = new ResizeObserver(draw); ro.observe(chartBox);
 </script>
 <script>
 {
+/* ===== NEWSLETTER: sign-ups go to the "Newsletter" tab of your Google Sheet ===== */
+const TPL = document.querySelector('[data-news="tips"]').outerHTML;
+window.TRP_NEWS = src => localStorage.getItem('trp-news') ? '' : TPL.replace('data-news="tips"', 'data-news="' + src + '"');
+const done = box => { box.querySelector('form').remove(); box.querySelector('.status').remove(); box.querySelector('p').outerHTML = '<p class="ok">You\'re on the list! Watch your inbox.</p>'; };
+if (localStorage.getItem('trp-news')) document.querySelectorAll('[data-news]').forEach(done);
+document.addEventListener('submit', async e => {
+  const box = e.target.closest('[data-news]'); if (!box) return;
+  e.preventDefault();
+  const f = e.target, msg = box.querySelector('.status'), btn = f.querySelector('button');
+  const email = f.email.value.trim(), name = f.name.value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = 'Please check your email address.'; f.email.focus(); return; }
+  const url = window.TRP_SHEET;
+  if (!url) { msg.textContent = 'Sign-ups open soon.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing you up…'; msg.textContent = '';
+  try {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'newsletter', name, email, source: box.dataset.news }) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error === 'Unknown action.' ? 'Sign-ups open soon. Please try again later.' : (j.error || 'Something went wrong.'));
+    try { localStorage.setItem('trp-news', '1'); } catch (err) {}
+    document.querySelectorAll('[data-news]').forEach(done);
+  } catch (err) {
+    msg.textContent = err.message && !/fetch|JSON|network/i.test(err.message) ? err.message : 'Could not sign you up right now. Please try again.';
+    btn.disabled = false; btn.textContent = 'Sign me up';
+  }
+});
+}
+</script>
+<script>
+{
 /* ===== BLOG: articles come from the "Blog" tab of your Google Sheet =====
    Writing codes you can use in the "body" cell (one per line):
      ## Heading            ### Smaller heading
@@ -1178,6 +1233,7 @@ const openPost = (s, push) => {
    <div style="padding:0 clamp(14px,4vw,24px)"><header class="rd-head"><span class="pill" style="background:${c[1]};display:inline-block;padding:5px 14px;border:2px solid #0F2236;border-radius:999px;font-weight:900;font-size:14px">${esc(p.category || 'Tips')}</span><h1>${esc(p.title)}</h1>${p.summary ? `<p class="lead">${esc(p.summary)}</p>` : ''}<div class="post-meta">${p.author ? `<span>By ${esc(p.author)}</span><span aria-hidden="true">·</span>` : ''}${p.date ? `<span>${esc(niceDate(p.date))}</span><span aria-hidden="true">·</span>` : ''}<span>${readTime(p)}</span></div></header></div>
    <div class="rd-wrap"><article class="rd-body">${render(p.body, s)}</article>
     <div class="rd-share"><b style="font:700 22px 'Fredoka',sans-serif">Found this useful? Share it with your running crew.</b><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="rd-btn" href="${esc(wa)}" target="_blank" rel="noopener" style="background:#25D366">WhatsApp</a><button type="button" class="rd-btn" data-copy="${esc(url)}">Copy link</button></div></div>
+    ${window.TRP_NEWS ? window.TRP_NEWS('article') : ''}
     ${more.length ? `<div class="rd-more"><h2 style="font-size:30px;margin-bottom:18px">Keep reading</h2><div class="post-grid">${more.map(x => card(x, posts.indexOf(x))).join('')}</div></div>` : ''}
    </div>`;
   const ticks = store.get('ticks-' + s) || [];
