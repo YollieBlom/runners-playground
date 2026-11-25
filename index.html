@@ -54,7 +54,7 @@ header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:var(--line
  .menu .btn{margin-top:8px}
 }
 /* hero */
-.hero{background:var(--tq)}
+.hero{background:var(--tq);overflow:hidden}
 .hero .wrap{display:grid;gap:48px;align-items:center;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
 .hero h1{font-size:clamp(46px,7vw,84px);margin:20px 0 18px}
 .hero h1 mark{background:var(--pk);color:var(--ink);padding:0 12px;border:var(--line);border-radius:18px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
@@ -178,6 +178,8 @@ footer a{color:#fff}
 .f-go{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;font:800 22px/44px 'Nunito',sans-serif;text-align:center}
 .home-more{font-size:16px !important;margin:26px 0 0 !important}
 .home-more .d{display:none}
+footer .wrap:has(#join[hidden]){padding-top:8px}
+footer .wrap:has(#join[hidden]) .foot{margin-top:0;border-top:0}
 @media(min-width:901px){.hero .wrap.home{align-items:center;text-align:center}.hero .wrap.home p{margin-left:auto;margin-right:auto}.home-more .m{display:none}.home-more .d{display:inline}}
 .tabbar{display:none}
 @media(max-width:900px){
@@ -298,7 +300,7 @@ body.reading{overflow:hidden}
 <main>
 <section id="top" class="hero band">
  <div class="wrap home">
-  <div class="blob" style="bottom:20%;right:-30px;width:90px;height:90px;border-radius:50%;background:var(--ye)" aria-hidden="true"></div>
+  <div class="blob" style="bottom:-40px;right:-30px;width:120px;height:120px;border-radius:50%;background:var(--ye)" aria-hidden="true"></div>
   <div class="blob" style="top:7%;right:7%;width:54px;height:54px;border-radius:18px;background:var(--pk);transform:rotate(14deg)" aria-hidden="true"></div>
   <span class="pill" style="background:var(--ye)" id="hello">Howzit, runner!</span>
   <h1>Run. Play.<br><mark>Brag about it.</mark></h1>
