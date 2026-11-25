@@ -389,7 +389,7 @@ body.reading{overflow:hidden}
 <section id="diary" class="band diary">
  <div class="wrap">
   <div class="head-row">
-   <div><span class="eyebrow">Run Diary &amp; Heat Analyzer</span><h2>Your real effort<br>in Lowveld heat.</h2></div>
+   <div><span class="eyebrow">Run Diary &amp; Heat Analyzer</span><h2>Your real effort<br>in South African heat.</h2></div>
    <p class="lead" style="max-width:440px">Running 5:30/km at 28 °C and 75% humidity is a very different effort from a cool 14 °C morning. Add a run and see your true, heat-adjusted effort pace.</p>
   </div>
 
@@ -419,15 +419,9 @@ body.reading{overflow:hidden}
      <label class="field">Humidity (%)<input id="h-rh" type="number" inputmode="numeric" min="1" max="100" value="75"></label>
     </div>
     <label class="field">Where did you run?
-     <select id="h-loc">
-      <option value="-25.331,31.011">White River</option>
-      <option value="-25.475,30.970">Mbombela</option>
-      <option value="-25.588,30.767">Kaapsehoop</option>
-      <option value="-25.052,31.126">Hazyview</option>
-      <option value="-25.210,31.006">Legogote</option>
-      <option value="gps">Use my phone's location</option>
-     </select>
+     <input id="h-loc" type="text" autocomplete="address-level2" placeholder="Town or suburb, e.g. Durban">
     </label>
+    <button type="button" class="mini" id="h-gps" aria-pressed="false" style="margin:-4px 0 12px">Use my phone's location</button>
     <button type="button" class="mini" id="h-wx">Fill in the weather for this date and time</button>
    </div>
 
@@ -442,11 +436,11 @@ body.reading{overflow:hidden}
       <div><b id="h-pace">5:30</b><span>Actual pace /km</span></div>
       <div><b id="h-pct">+5.4%</b><span>Heat cost</span></div>
       <div><b id="h-dew">23 °C</b><span>Dew point</span></div>
-      <div><b id="h-sum">156</b><span>Temp + dew point (°F)</span></div>
+      <div><b id="h-sum">156</b><span>Heat score <small style="opacity:.75">(out of ~180)</small></span></div>
      </div>
      <button type="button" class="btn dark" id="h-save" style="margin-top:18px;width:100%">Save to my diary</button>
     </div>
-    <p style="font-size:14px;color:#CFE3F2;margin:12px 4px 0">Heat cost uses the temperature + dew point rule many coaches use: the higher the sum, the slower the same effort runs. Weather data from Open-Meteo.</p>
+    <p style="font-size:14px;color:#CFE3F2;margin:12px 4px 0">Heat score adds the air temperature and dew point on the scale running coaches use (in °F). Under 100 is easy, 130–150 means you'll be slower, and 170+ means take it easy. Weather data from Open-Meteo.</p>
    </div>
   </div>
 
@@ -748,7 +742,7 @@ const heatCost = sum => {
 const verdict = sum => sum <= 100 ? 'Perfect running weather. No adjustment needed.'
   : sum <= 130 ? 'Warm. You might lose a little pace, nothing major.'
   : sum <= 150 ? 'Warm and sticky. Slower splits are normal: run by effort, not pace.'
-  : sum <= 170 ? 'Steamy Lowveld special. Expect to be noticeably slower. Drink and ease off.'
+  : sum <= 170 ? 'Proper SA summer steamer. Expect to be noticeably slower. Drink and ease off.'
   : 'Dangerous heat. Easy running only, or move it to the treadmill or a cooler time.';
 
 let current = null;
@@ -763,7 +757,7 @@ const calc = () => {
   $('h-sum').textContent = sum;
   $('h-verdict').textContent = verdict(sum);
   $('h-needle').style.left = Math.max(2, Math.min(98, (sum - 80) / (190 - 80) * 100)) + '%';
-  $('h-meter-l').setAttribute('aria-label', 'Heat stress: ' + sum + ' on the temperature plus dew point scale');
+  $('h-meter-l').setAttribute('aria-label', 'Heat score: ' + sum + ' out of about 180');
   current = { date: $('h-date').value, time: $('h-time').value, km: +d.toFixed(2), secs: Math.round(t), temp: c, rh: Math.round(rh), sum, pct: +pct.toFixed(1), pace, eff };
 };
 ['h-d','h-h','h-m','h-s','h-t','h-rh','h-date','h-time'].forEach(id => $(id).addEventListener('input', calc));
@@ -778,15 +772,25 @@ document.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click',
 }));
 
 /* --- weather (Open-Meteo, free, no key) --- */
-let gpxCoords = null;
-const getCoords = () => new Promise((res, rej) => {
-  if (gpxCoords) return res(gpxCoords);
-  const v = $('h-loc').value;
-  if (v !== 'gps') { const [a, b] = v.split(','); return res([+a, +b]); }
-  if (!navigator.geolocation) return rej(new Error('Location is not available on this device.'));
-  navigator.geolocation.getCurrentPosition(p => res([p.coords.latitude, p.coords.longitude]), () => rej(new Error('Location was blocked. Pick a town from the list instead.')), { timeout: 10000 });
-});
-$('h-loc').addEventListener('change', () => { gpxCoords = null; });
+let gpxCoords = null, useGps = false, placeName = '';
+const setGps = on => { useGps = on; $('h-gps').setAttribute('aria-pressed', on); $('h-gps').textContent = on ? 'Using my phone\'s location ✓' : 'Use my phone\'s location'; if (on) $('h-loc').value = ''; };
+$('h-gps').addEventListener('click', () => { gpxCoords = null; setGps(!useGps); });
+$('h-loc').addEventListener('input', () => { gpxCoords = null; if (useGps) setGps(false); });
+const getCoords = async () => {
+  placeName = '';
+  if (gpxCoords) return gpxCoords;
+  if (useGps) return new Promise((res, rej) => {
+    if (!navigator.geolocation) return rej(new Error('Location is not available on this device. Type your town instead.'));
+    navigator.geolocation.getCurrentPosition(p => res([p.coords.latitude, p.coords.longitude]), () => rej(new Error('Location was blocked. Type your town instead.')), { timeout: 10000 });
+  });
+  const name = $('h-loc').value.trim();
+  if (!name) throw new Error('Type the town or suburb where you ran, or use your phone\'s location.');
+  const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&countryCode=ZA&name=' + encodeURIComponent(name));
+  const g = r.ok ? (await r.json()).results?.[0] : null;
+  if (!g) throw new Error(`Could not find "${name}" in South Africa. Try a nearby bigger town.`);
+  placeName = g.name + (g.admin1 ? ', ' + g.admin1 : '');
+  return [g.latitude, g.longitude];
+};
 const fetchWeather = async () => {
   const date = $('h-date').value, time = $('h-time').value || '06:00';
   if (!date) { status('Pick a date first.', true); return; }
@@ -803,7 +807,7 @@ const fetchWeather = async () => {
     const t = j.hourly?.temperature_2m?.[hr], rh = j.hourly?.relative_humidity_2m?.[hr];
     if (t == null || rh == null) throw new Error('No weather found for that hour.');
     $('h-t').value = Math.round(t * 10) / 10; $('h-rh').value = Math.round(rh);
-    calc(); status(`Weather at ${pad(hr)}:00: ${t.toFixed(1)} °C and ${Math.round(rh)}% humidity.`);
+    calc(); status(`Weather${placeName ? ' in ' + placeName : ''} at ${pad(hr)}:00: ${t.toFixed(1)} °C and ${Math.round(rh)}% humidity.`);
   } catch (e) { status((e.message || 'Could not get the weather.') + ' You can type it in yourself.', true); }
 };
 $('h-wx').addEventListener('click', fetchWeather);
@@ -976,7 +980,7 @@ const STARTER = [
   { date: '2026-11-20', category: 'Race day', color: 'yellow', title: 'Your night-before race checklist', summary: 'Kit, fuel, alarm, repeat. Tick off everything you need so race morning is calm, not chaos.',
     body: 'Race morning nerves are normal. Race morning panic is not. Get these done the night before and you will wake up calm.\n\n## Tick these off tonight\n[] Lay out your full kit, shoes and socks\n[] Pin your race number on your shirt\n[] Charge your watch and phone\n[] Set two alarms\n[] Pack water, snacks and something warm for after\n[] Check how you get to the start, and leave early\n\n!warning: Nothing new on race day! No new shoes, no new gels, no new breakfast.\n\n## Race morning\n1. Eat a familiar breakfast 2 to 3 hours before the start\n2. Arrive 45 minutes early\n3. Warm up with 10 minutes of easy jogging\n4. Start slower than you want to\n\n> The race is won in the second half. Be patient in the first.' },
   { date: '2026-11-15', category: 'Hills', color: 'pink', title: 'Make friends with hills', summary: 'Hills don\'t have to hurt. Simple form tips for strong climbs and fast, safe descents.',
-    body: 'Lowveld runners can\'t escape hills, so we might as well get good at them. The trick is effort, not pace.\n\n## Going up\n- Shorten your stride and take quick little steps\n- Lean slightly forward from your ankles, not your waist\n- Drive your arms, they pull your legs along\n- Look a few metres ahead, not at your feet\n\n!fact: Running uphill at the same effort as the flat, you can easily be a minute per km slower. That\'s normal!\n\n## Going down\nRelax, let gravity help and keep your feet under you. Quick light steps protect your knees and quads.\n\n!tip: Walking the steepest bits is smart, not cheating. Many top trail runners do it.\n\n---\n\nPractise on one hill a week and in a month you will wonder why you ever dreaded them.' }
+    body: 'South African runners can\'t escape hills, so we might as well get good at them. The trick is effort, not pace.\n\n## Going up\n- Shorten your stride and take quick little steps\n- Lean slightly forward from your ankles, not your waist\n- Drive your arms, they pull your legs along\n- Look a few metres ahead, not at your feet\n\n!fact: Running uphill at the same effort as the flat, you can easily be a minute per km slower. That\'s normal!\n\n## Going down\nRelax, let gravity help and keep your feet under you. Quick light steps protect your knees and quads.\n\n!tip: Walking the steepest bits is smart, not cheating. Many top trail runners do it.\n\n---\n\nPractise on one hill a week and in a month you will wonder why you ever dreaded them.' }
 ];
 let posts = STARTER.slice(), cat = '', q = '', shown = 6;
 const slug = p => String(p.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'article';
