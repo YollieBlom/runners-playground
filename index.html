@@ -6,6 +6,10 @@
 <title>The Runners Playground</title>
 <meta name="description" content="Running calculators, community challenges, badges, training plans and tips. Run. Play. Brag about it.">
 <meta name="theme-color" content="#2EC4B6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Playground">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -111,6 +115,17 @@ details.card .body{padding:0 26px 26px}
 .weeks{margin:0;padding-left:20px}
 .weeks li{margin-bottom:6px}
 .thumb{height:150px;overflow:hidden;border-bottom:var(--line);display:flex;align-items:center;justify-content:center;border-radius:23px 23px 0 0}
+/* go pro: workshop + supporters */
+.workshop{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:center}
+.workshop h2 mark{background:var(--ye);color:var(--ink);padding:0 10px;border:var(--line);border-radius:16px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.workshop .lead{color:var(--ink)}
+.cones{width:100%;max-width:360px;justify-self:center;overflow:visible}
+@media (prefers-reduced-motion:no-preference){.cone{animation:wobble 2.4s ease-in-out infinite;transform-origin:70px 186px}.cone.c2{animation-delay:-1.2s;transform-origin:190px 186px}@keyframes wobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}}
+.wall{margin-top:36px;background:#fff}
+.wall ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.wall li{padding:8px 16px;border:var(--line);border-radius:999px;font-weight:800;background:var(--tq-l)}
+.wall li.biz{background:var(--pk-l)}
+.wall li.empty{border-style:dashed;background:#fff}
 /* pricing */
 .price{display:flex;flex-direction:column;gap:14px}
 .price .amt{font:700 46px/1 'Fredoka',sans-serif;white-space:nowrap}
@@ -128,6 +143,10 @@ footer a{color:#fff}
 .diary{background:var(--ink);color:#fff}
 .diary .eyebrow{color:var(--tq)}
 .diary .lead{color:#E4EEF6}
+#r-card .status{color:var(--ink)}
+#r-card .status.err{color:var(--pk-d)}
+.r-skip{display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;margin:0 0 16px;cursor:pointer}
+.r-skip input{width:22px;height:22px;flex:none;accent-color:var(--ink)}
 .heat{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));align-items:start}
 .panel{background:#fff;color:var(--ink);border:3px solid #fff;border-radius:28px;padding:clamp(20px,3vw,30px)}
 .src{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px}
@@ -514,6 +533,19 @@ body.reading{overflow:hidden}
      <div><b id="m-streak">0</b><span>week streak</span></div>
     </div>
    </div>
+   <div class="card" id="r-card" style="color:var(--ink);background:var(--ye);border-color:#fff;box-shadow:7px 7px 0 var(--pk)">
+    <span class="pill" style="background:#fff">Opt-in</span>
+    <h3 style="margin:12px 0 8px">Daily nudge</h3>
+    <p style="margin:0 0 14px" id="r-msg">Pick a time and we'll send you a little push notification to log today's run.</p>
+    <label class="field">Remind me at<select id="r-time"></select></label>
+    <label class="r-skip"><input type="checkbox" id="r-skip" checked>Skip days I've already logged a run</label>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+     <button type="button" class="btn dark" id="r-on">Remind me</button>
+     <button type="button" class="mini" id="r-off" hidden style="background:#fff">Turn off</button>
+    </div>
+    <p class="status" id="r-status" aria-live="polite" style="margin:12px 0 0"></p>
+    <p class="note" id="r-ios" hidden style="color:var(--ink);margin:8px 0 0"><b>On iPhone:</b> tap Share, then "Add to Home Screen". Open the Playground from that new icon and turn the nudge on there.</p>
+   </div>
    <div class="card" style="background:var(--pk);border-color:#fff;box-shadow:7px 7px 0 var(--tq)">
     <span class="pill" style="background:#fff">Opt-in</span>
     <h3 style="margin:12px 0 8px">Pace Matchmaker</h3>
@@ -575,31 +607,55 @@ body.reading{overflow:hidden}
  </div>
 </section>
 
-<section id="pricing" class="band">
+<section id="pricing" class="band" style="background:var(--tq)">
  <div class="wrap">
-  <div style="text-align:center;margin-bottom:44px">
-   <span class="eyebrow">Pricing</span>
-   <h2>Free to play. Pro to show off.</h2>
-   <p class="lead" style="margin:12px auto 0">The basics are free forever. Pro is coming soon. Join the waitlist to lock in the founding member price.</p>
-  </div>
-  <div class="grid" style="align-items:stretch">
-   <div class="card price" style="background:var(--tq-l)">
-    <h3>Free</h3><div class="amt">R0</div>
-    <ul><li>All basic calculators</li><li>Join community challenges</li><li>Earn standard badges</li><li>Tips and starter plans</li></ul>
-    <a class="btn" href="#join">Join free</a>
+  <div class="workshop">
+   <div>
+    <span class="eyebrow" style="color:var(--ink)">Go Pro</span>
+    <h2>Pro is still in the <mark>workshop</mark>.</h2>
+    <p class="lead">We're busy building the Pro corner of the Playground: bolting on swings, painting the slides and testing every gadget on real runs. It isn't ready yet, but the rest of the Playground is open and free for everyone.</p>
    </div>
+   <svg class="cones" viewBox="0 0 260 200" role="img" aria-label="Traffic cones and a 'work in progress' sign">
+    <rect x="40" y="30" width="180" height="70" rx="14" fill="#FFD23F" stroke="#0F2236" stroke-width="5"/>
+    <path d="M60 30 80 100M100 30l20 70M140 30l20 70M180 30l20 70" stroke="#0F2236" stroke-width="5" opacity=".18"/>
+    <text text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="24" fill="#0F2236"><tspan x="130" y="60">WORK IN</tspan><tspan x="130" y="88">PROGRESS</tspan></text>
+    <path d="M70 100v70M190 100v70" stroke="#0F2236" stroke-width="6" stroke-linecap="round"/>
+    <g class="cone"><path d="M40 182 62 110h16l22 72z" fill="#FF5C8A" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M53 152h34" stroke="#fff" stroke-width="9"/><rect x="28" y="178" width="84" height="12" rx="6" fill="#FF5C8A" stroke="#0F2236" stroke-width="5"/></g>
+    <g class="cone c2"><path d="M160 182l22-72h16l22 72z" fill="#FF5C8A" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M173 152h34" stroke="#fff" stroke-width="9"/><rect x="148" y="178" width="84" height="12" rx="6" fill="#FF5C8A" stroke="#0F2236" stroke-width="5"/></g>
+   </svg>
+  </div>
+
+  <div class="grid" style="align-items:stretch;margin-top:44px">
    <div class="card price" style="background:var(--ye);box-shadow:9px 9px 0 var(--pk);position:relative">
-    <span class="pill" style="position:absolute;top:-16px;right:22px;background:var(--pk);border-width:3px">Coming soon</span>
-    <h3>Pro</h3><div class="amt">R29<small>/month</small></div>
-    <span style="font-weight:700;margin-top:-6px">or R290/year (2 months free)</span>
-    <ul><li>Race plans that adapt to your goal time</li><li>Export pace plans to your watch</li><li>Pro-only badges and full stats history</li><li>Private challenges with friends</li><li>Discounts on virtual race entries</li></ul>
-    <a class="btn dark" data-link="signup" href="#">Join the Pro waitlist</a>
+    <span class="pill" style="position:absolute;top:-16px;right:22px;background:var(--pk);border-width:3px">Open now</span>
+    <h3>Playground Supporter</h3>
+    <div class="amt">R10<small>/month</small></div>
+    <span style="font-weight:700;margin-top:-6px">or R99 for a whole year</span>
+    <p style="margin:0">The Playground is built and looked after by one developer. By supporting, you're helping keep it running, growing and free for every runner. Thank you!</p>
+    <ul><li>Your name on the Thank-you Wall</li><li>A Supporter badge next to your name (coming to the leaderboards soon)</li><li>A founding member discount on Pro, for life</li><li>A warm, fuzzy, post-run feeling</li></ul>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+     <a class="btn dark" data-link="supportMonthly" href="#">R10 a month</a>
+     <a class="btn" data-link="supportYearly" href="#">R99 a year</a>
+    </div>
+   </div>
+   <div class="card price" style="background:#fff">
+    <h3>On the workbench</h3>
+    <p style="margin:0">What we're building for Pro:</p>
+    <ul><li>Race plans that adapt to your goal time</li><li>Export pace plans to your watch</li><li>Pro-only badges and full stats history</li><li>Private challenges with friends</li><li>Club leaderboards and club-only challenges</li></ul>
+    <a class="btn" href="#join">Tell me when it's ready</a>
    </div>
    <div class="card price" style="background:var(--pk-l)">
-    <h3>Club</h3><div class="amt">R250<small>/month</small></div>
-    <ul><li>Your own club leaderboard</li><li>Club-only challenges and badges</li><li>Member check-ins for club runs</li><li>Club page with your logo</li></ul>
-    <a class="btn" data-link="clubs" href="#">Talk to us</a>
+    <h3>Business sponsors</h3>
+    <p style="margin:0">Own a running shop, physio practice, coffee spot or anything runners love? Put your name on a race pacer or a community challenge and get seen by runners all over South Africa.</p>
+    <ul><li>Your logo on a race pacer or challenge</li><li>A shout-out in the Playground Post newsletter</li><li>A spot on the Thank-you Wall</li></ul>
+    <a class="btn" data-link="sponsor" href="#">Let's talk</a>
    </div>
+  </div>
+
+  <div class="card wall">
+   <span class="eyebrow">Thank-you Wall</span>
+   <h3>The legends keeping the Playground open</h3>
+   <ul id="wall"></ul>
   </div>
  </div>
 </section>
@@ -610,7 +666,7 @@ body.reading{overflow:hidden}
   <div id="join">
 <div class="news" style="margin-top:0" data-news="pro">
  <h3>Ready to play?</h3>
- <p>Sign up free to hear about challenges, new race pacers and Pro first. About once a month, no spam.</p>
+ <p>Sign up free to hear about challenges, new race pacers and when Pro opens. About once a month, no spam.</p>
  <form novalidate>
   <label class="field">First name<input name="name" type="text" autocomplete="given-name" maxlength="40"></label>
   <label class="field">Email<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" required></label>
@@ -645,12 +701,15 @@ const LINKS = {
   nextRace:   "https://yollieblom.github.io/race-pacer/?race=westvaal",  // big button on the home page
   signup:     "",  // Google Form for sign-ups / Pro waitlist
   clubs:      "",  // Google Form or WhatsApp link for clubs
+  supportMonthly: "",  // payment link for R10 a month (e.g. Paystack payment page or SnapScan)
+  supportYearly:  "",  // payment link for R99 a year
+  sponsor:    "",  // email (mailto:...) or WhatsApp link for business sponsors
   sheet:      "https://script.google.com/macros/s/AKfycbwigsHxdzNvrx1_YdehnBkAiUMumAELNk_nWtRYYV42exLESbKCPsqdnN6p1ctjxSd7/exec"   // your Google Apps Script web app URL (same one as the leaderboard): blog articles come from here
 };
 document.querySelectorAll('[data-link]').forEach(a => {
   const url = LINKS[a.dataset.link];
   if (url) { a.href = url; if (!url.includes('yollieblom.github.io')) { a.target = '_blank'; a.rel = 'noopener'; } }
-  else a.addEventListener('click', e => { e.preventDefault(); a.textContent = 'Link coming soon'; });
+  else a.addEventListener('click', e => { e.preventDefault(); a.textContent = /^support/.test(a.dataset.link) ? 'Opening very soon!' : 'Link coming soon'; });
 });
 
 /* ===== NEXT RACE on the home page: change these when a new race comes up ===== */
@@ -663,6 +722,16 @@ const num = id => { const v = parseFloat($(id).value); return isFinite(v) && v >
 const secs = p => num(p + '-h') * 3600 + num(p + '-m') * 60 + num(p + '-s');
 const fmt = t => { t = Math.round(t); const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0'); };
 const store = { get(k){ try { return JSON.parse(localStorage.getItem('trp-' + k)); } catch(e){ return null; } }, set(k, v){ try { localStorage.setItem('trp-' + k, JSON.stringify(v)); } catch(e){} } };
+/* ===== THANK-YOU WALL: add each supporter's name between the brackets, e.g. "Thandi M.", =====
+   Put business sponsors in SPONSORS. Always ask before showing someone's name. */
+const SUPPORTERS = [];
+const SPONSORS = [];
+(() => {
+  const ul = $('wall'), esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const items = SPONSORS.map(n => '<li class="biz">' + esc(n) + '</li>').concat(SUPPORTERS.map(n => '<li>' + esc(n) + '</li>'));
+  ul.innerHTML = items.length ? items.join('') : '<li class="empty">Your name could be first! 💛</li>';
+})();
+
 const DISTS = [[5,'5K'],[10,'10K'],[21.1,'Half'],[42.2,'Marathon']];
 
 /* tabs */
@@ -1020,7 +1089,7 @@ $('h-save').addEventListener('click', async () => {
   if (!cryptoKey) { status('Open your diary below first (username and PIN), then tap save again.', true); $('diary-panel').scrollIntoView({ behavior: 'smooth' }); $('d-user').focus({ preventScroll: true }); return; }
   runs.push({ ...current, id: Date.now() });
   runs.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  await persist(); render(); status('Saved to your diary.');
+  await persist(); render(); status('Saved to your diary.'); window.dispatchEvent(new Event('trp-run-saved'));
 });
 $('d-rows').addEventListener('click', async e => {
   const b = e.target.closest('[data-del]'); if (!b) return;
@@ -1304,6 +1373,99 @@ if (r && r.name) {
   document.getElementById('nr-name').textContent = r.name + ' · ' + ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ' ' + d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
   document.getElementById('nr-when').textContent = days > 1 ? days + ' days to go' : days === 1 ? 'Tomorrow!' : days === 0 ? 'Race day!' : 'Next race';
 }
+}
+</script>
+<script>
+{
+/* ===== DAILY NUDGE: opt-in push reminders to log today's run =====
+   1. Make a free OneSignal app (Web, "Custom Code"), site URL https://yollieblom.github.io
+   2. Paste its App ID between the quotes below and upload index.html.
+   The reminders are sent by the separate Reminders.gs Apps Script (see README). */
+const ONESIGNAL_APP_ID = "";
+
+const $ = id => document.getElementById(id);
+const KEY = 'trp-remind';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } };
+const save = v => { try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch (e) {} };
+const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(new Date());
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const canPush = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+/* time choices: 04:00 to 21:30, every half hour (South African time) */
+const sel = $('r-time');
+for (let m = 4 * 60; m <= 21 * 60 + 30; m += 30) {
+  const v = String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+  sel.add(new Option(v, v));
+}
+sel.value = '18:00';
+
+const say = (t, err) => { $('r-status').textContent = t; $('r-status').classList.toggle('err', !!err); };
+const show = on => {
+  $('r-on').textContent = on ? 'Save new time' : 'Remind me';
+  $('r-off').hidden = !on;
+  $('r-msg').textContent = on
+    ? 'Your nudge is on. We\'ll ping you around ' + sel.value + ' (SA time)' + ($('r-skip').checked ? ' on days you haven\'t logged a run yet.' : ' every day.')
+    : 'Pick a time and we\'ll send you a little push notification to log today\'s run.';
+};
+
+/* OneSignal only loads when someone uses the nudge, so the page stays quick for everyone else */
+let ready = null;
+const sdk = () => ready || (ready = new Promise((res, rej) => {
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async OS => {
+    try {
+      await OS.init({ appId: ONESIGNAL_APP_ID, serviceWorkerPath: 'runners-playground/push/onesignal/OneSignalSDKWorker.js', serviceWorkerParam: { scope: '/runners-playground/push/onesignal/' } });
+      res(OS);
+    } catch (e) { rej(e); }
+  });
+  const s = document.createElement('script');
+  s.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; s.defer = true;
+  s.onerror = () => rej(new Error('load'));
+  document.head.appendChild(s);
+}).catch(e => { ready = null; throw e; }));
+
+const tags = () => ({ remind_at: sel.value, skip_logged: $('r-skip').checked ? '1' : '0' });
+
+$('r-on').addEventListener('click', async () => {
+  if (!ONESIGNAL_APP_ID) { say('Daily nudges are coming soon!'); return; }
+  if (isIOS && !installed) { $('r-ios').hidden = false; say('One quick step first (see below).'); return; }
+  if (!canPush) { say('This browser can\'t show notifications. Try Chrome, or Safari from your home screen.', true); return; }
+  if (Notification.permission === 'denied') { say('Notifications are blocked for this site. Allow them in your browser\'s site settings, then try again.', true); return; }
+  const btn = $('r-on'); btn.disabled = true; say('Setting up your nudge…');
+  try {
+    const OS = await sdk();
+    if (Notification.permission !== 'granted') await OS.Notifications.requestPermission();
+    if (Notification.permission !== 'granted') { say('No problem. Tap "Remind me" again whenever you change your mind.'); return; }
+    await OS.User.PushSubscription.optIn();
+    OS.User.addTags(tags());
+    save({ at: sel.value, skip: $('r-skip').checked });
+    show(true); say('Done! Look out for your first nudge at ' + sel.value + '.');
+  } catch (e) {
+    say('Could not set up the nudge right now. Please try again.', true);
+  } finally { btn.disabled = false; }
+});
+
+$('r-off').addEventListener('click', async () => {
+  try { const OS = await sdk(); await OS.User.PushSubscription.optOut(); OS.User.removeTags(['remind_at', 'skip_logged']); } catch (e) {}
+  save(null); show(false); say('Nudges are off. You can switch them back on anytime.');
+});
+
+/* a run saved in the diary tells the reminder service "already logged today" */
+window.addEventListener('trp-run-saved', () => {
+  if (!load() || !ONESIGNAL_APP_ID) return;
+  sdk().then(OS => OS.User.addTag('last_log', today())).catch(() => {});
+});
+
+/* coming back to the page: show what is set */
+const mine = load();
+if (!ONESIGNAL_APP_ID) { $('r-on').textContent = 'Coming soon'; }
+else if (mine) {
+  sel.value = mine.at; $('r-skip').checked = mine.skip !== false;
+  if (canPush && Notification.permission === 'granted') show(true);
+  else { save(null); show(false); }
+}
+if (isIOS && !installed) $('r-ios').hidden = false;
 }
 </script>
 </body>
