@@ -115,12 +115,27 @@ details.card .body{padding:0 26px 26px}
 .weeks{margin:0;padding-left:20px}
 .weeks li{margin-bottom:6px}
 .thumb{height:150px;overflow:hidden;border-bottom:var(--line);display:flex;align-items:center;justify-content:center;border-radius:23px 23px 0 0}
-/* go pro: workshop + supporters */
+/* support page: supporters + sponsors */
 .workshop{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:center}
 .workshop h2 mark{background:var(--ye);color:var(--ink);padding:0 10px;border:var(--line);border-radius:16px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .workshop .lead{color:var(--ink)}
-.cones{width:100%;max-width:360px;justify-self:center;overflow:visible}
-@media (prefers-reduced-motion:no-preference){.cone{animation:wobble 2.4s ease-in-out infinite;transform-origin:70px 186px}.cone.c2{animation-delay:-1.2s;transform-origin:190px 186px}@keyframes wobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}}
+.cones{width:100%;max-width:340px;justify-self:center;overflow:visible}
+@media (max-width:600px){.cones{max-width:200px}}
+@media (prefers-reduced-motion:no-preference){.beat{animation:beat 1.8s ease-in-out infinite;transform-origin:130px 105px}@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.07)}24%{transform:scale(1)}36%{transform:scale(1.05)}}}
+.code-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+.code-row input{min-height:48px;border:var(--line);border-radius:999px;padding:0 18px;font:700 16px 'Nunito',sans-serif;width:min(100%,200px);background:#fff;color:var(--ink)}
+/* sponsor banner */
+.spon-slot{padding:22px 0}
+.spon{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:var(--line);border-radius:22px;padding:14px 18px;box-shadow:5px 5px 0 var(--ink);text-decoration:none;color:var(--ink);position:relative}
+.spon:hover{transform:translate(-1px,-1px)}
+.spon .tag{position:absolute;top:-12px;left:16px;background:var(--ye);border:2px solid var(--ink);border-radius:999px;padding:1px 10px;font:900 12px 'Nunito',sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.spon img{height:44px;width:auto;max-width:120px;object-fit:contain}
+.spon .txt{flex:1 1 220px;font-weight:600;font-size:15px;line-height:1.4;color:var(--slate)}
+.spon .txt b{font:700 18px 'Fredoka',sans-serif;display:block;color:var(--ink)}
+@media (max-width:600px){.spon{padding:14px 14px 12px;gap:8px}.spon .txt{font-size:14px}}
+.spon .go{font-weight:900;white-space:nowrap;border-bottom:3px solid var(--pk)}
+.spon.house{background:repeating-linear-gradient(135deg,#fff 0 14px,var(--ye-l) 14px 28px);border-style:dashed}
+.rd-wrap .spon-slot{padding:8px 0 24px}
 .wall{margin-top:36px;background:#fff}
 .wall ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
 .wall li{padding:8px 16px;border:var(--line);border-radius:999px;font-weight:800;background:var(--tq-l)}
@@ -330,7 +345,7 @@ body.reading{overflow:hidden}
    <a href="#play" data-nav="play">Play</a>
    <a href="#tips" data-nav="tips">Tips</a>
   </nav>
-  <a class="btn pink gopro" href="#pro" data-nav="pro">Go Pro</a>
+  <a class="btn pink gopro" href="#support" data-nav="support">💛 Support</a>
  </div>
 </header>
 
@@ -611,17 +626,16 @@ body.reading{overflow:hidden}
  <div class="wrap">
   <div class="workshop">
    <div>
-    <span class="eyebrow" style="color:var(--ink)">Go Pro</span>
-    <h2>Pro is still in the <mark>workshop</mark>.</h2>
-    <p class="lead">We're busy building the Pro corner of the Playground: bolting on swings, painting the slides and testing every gadget on real runs. It isn't ready yet, but the rest of the Playground is open and free for everyone.</p>
+    <span class="eyebrow" style="color:var(--ink)">Support the Playground</span>
+    <h2>Free for every runner. <mark>Kept going</mark> by you.</h2>
+    <p class="lead">Every pacer, calculator, challenge and article on the Playground is free, and it's staying that way. No subscriptions, no paywalls. If it helps your running, you can help keep the lights on (and the domain paid) for less than a coffee.</p>
    </div>
-   <svg class="cones" viewBox="0 0 260 200" role="img" aria-label="Traffic cones and a 'work in progress' sign">
-    <rect x="40" y="30" width="180" height="70" rx="14" fill="#FFD23F" stroke="#0F2236" stroke-width="5"/>
-    <path d="M60 30 80 100M100 30l20 70M140 30l20 70M180 30l20 70" stroke="#0F2236" stroke-width="5" opacity=".18"/>
-    <text text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="24" fill="#0F2236"><tspan x="130" y="60">WORK IN</tspan><tspan x="130" y="88">PROGRESS</tspan></text>
-    <path d="M70 100v70M190 100v70" stroke="#0F2236" stroke-width="6" stroke-linecap="round"/>
-    <g class="cone"><path d="M40 182 62 110h16l22 72z" fill="#FF5C8A" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M53 152h34" stroke="#fff" stroke-width="9"/><rect x="28" y="178" width="84" height="12" rx="6" fill="#FF5C8A" stroke="#0F2236" stroke-width="5"/></g>
-    <g class="cone c2"><path d="M160 182l22-72h16l22 72z" fill="#FF5C8A" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M173 152h34" stroke="#fff" stroke-width="9"/><rect x="148" y="178" width="84" height="12" rx="6" fill="#FF5C8A" stroke="#0F2236" stroke-width="5"/></g>
+   <svg class="cones" viewBox="0 0 260 210" role="img" aria-label="A big pink heart with a running shoe">
+    <circle cx="40" cy="40" r="14" fill="#FFD23F" stroke="#0F2236" stroke-width="4"/>
+    <circle cx="226" cy="54" r="9" fill="#fff" stroke="#0F2236" stroke-width="4"/>
+    <circle cx="214" cy="176" r="12" fill="#FFD23F" stroke="#0F2236" stroke-width="4"/>
+    <g class="beat"><path d="M130 190C70 150 34 118 34 78a44 44 0 0 1 96-14 44 44 0 0 1 96 14c0 40-36 72-96 112z" fill="#FF5C8A" stroke="#0F2236" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M82 112h52l8-14h22c10 0 16 6 16 14v6H82z" fill="#fff" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M82 118h98v10H82z" fill="#2EC4B6" stroke="#0F2236" stroke-width="5" stroke-linejoin="round"/><path d="M112 104l6 8M124 100l6 8" stroke="#0F2236" stroke-width="4" stroke-linecap="round"/></g>
    </svg>
   </div>
 
@@ -632,22 +646,24 @@ body.reading{overflow:hidden}
     <div class="amt">R10<small>/month</small></div>
     <span style="font-weight:700;margin-top:-6px">or R99 for a whole year</span>
     <p style="margin:0">The Playground is built and looked after by one developer. By supporting, you're helping keep it running, growing and free for every runner. Thank you!</p>
-    <ul><li>Your name on the Thank-you Wall</li><li>A Supporter badge next to your name (coming to the leaderboards soon)</li><li>A founding member discount on Pro, for life</li><li>A warm, fuzzy, post-run feeling</li></ul>
+    <ul><li>Your name on the Thank-you Wall</li><li>No sponsor banners while you browse</li><li>A Supporter badge next to your name (coming to the leaderboards soon)</li><li>A warm, fuzzy, post-run feeling</li></ul>
     <div style="display:flex;flex-wrap:wrap;gap:10px">
      <a class="btn dark" data-link="supportMonthly" href="#">R10 a month</a>
      <a class="btn" data-link="supportYearly" href="#">R99 a year</a>
     </div>
+    <form class="code-row" id="sup-form" novalidate><label class="sr-only" for="sup-code">Supporter code</label><input id="sup-code" placeholder="Supporter code" autocomplete="off" maxlength="40"><button type="submit" class="btn dark">Hide banners</button></form>
+    <small id="sup-msg" aria-live="polite">Already a supporter? Enter the code from your thank-you message to hide the banners on this device.</small>
    </div>
    <div class="card price" style="background:#fff">
-    <h3>On the workbench</h3>
-    <p style="margin:0">What we're building for Pro:</p>
-    <ul><li>Race plans that adapt to your goal time</li><li>Export pace plans to your watch</li><li>Pro-only badges and full stats history</li><li>Private challenges with friends</li><li>Club leaderboards and club-only challenges</li></ul>
-    <a class="btn" href="#join">Tell me when it's ready</a>
+    <h3>Free ways to help</h3>
+    <p style="margin:0">No money needed. These help just as much:</p>
+    <ul><li>Share the race pacer in your club's WhatsApp group</li><li>Tell a running shop or physio about our sponsor spots</li><li>Join the Playground Post newsletter</li><li>Send us your ideas for new pacers and challenges</li></ul>
+    <a class="btn" href="#join">Join the newsletter</a>
    </div>
    <div class="card price" style="background:var(--pk-l)">
     <h3>Business sponsors</h3>
     <p style="margin:0">Own a running shop, physio practice, coffee spot or anything runners love? Put your name on a race pacer or a community challenge and get seen by runners all over South Africa.</p>
-    <ul><li>Your logo on a race pacer or challenge</li><li>A shout-out in the Playground Post newsletter</li><li>A spot on the Thank-you Wall</li></ul>
+    <ul><li>Your banner on the Playground's pages and articles</li><li>Your logo on a race pacer or challenge</li><li>A shout-out in the Playground Post newsletter</li><li>A spot on the Thank-you Wall</li></ul>
     <a class="btn" data-link="sponsor" href="#">Let's talk</a>
    </div>
   </div>
@@ -660,13 +676,14 @@ body.reading{overflow:hidden}
  </div>
 </section>
 </main>
+<div class="spon-slot" id="spon-slot"><div class="wrap"></div></div>
 
 <footer>
  <div class="wrap" style="padding-bottom:40px">
   <div id="join">
-<div class="news" style="margin-top:0" data-news="pro">
+<div class="news" style="margin-top:0" data-news="support">
  <h3>Ready to play?</h3>
- <p>Sign up free to hear about challenges, new race pacers and when Pro opens. About once a month, no spam.</p>
+ <p>Sign up free to hear about new challenges, race pacers and running tips. About once a month, no spam.</p>
  <form novalidate>
   <label class="field">First name<input name="name" type="text" autocomplete="given-name" maxlength="40"></label>
   <label class="field">Email<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" required></label>
@@ -699,7 +716,7 @@ const LINKS = {
   kaapsehoop: "https://pacer.runnersplayground.com/?race=kaapsehoop",  // Kaapsehoop 4 in 1 Marathon (past race)
   pacer:      "https://pacer.runnersplayground.com/",       // Race pacers for every race (Westvaal and more)
   nextRace:   "https://pacer.runnersplayground.com/?race=westvaal",  // big button on the home page
-  signup:     "",  // Google Form for sign-ups / Pro waitlist
+  signup:     "",  // Google Form for sign-ups (not used at the moment)
   clubs:      "",  // Google Form or WhatsApp link for clubs
   supportMonthly: "",  // payment link for R10 a month (e.g. Paystack payment page or SnapScan)
   supportYearly:  "",  // payment link for R99 a year
@@ -731,6 +748,39 @@ const SPONSORS = [];
   const items = SPONSORS.map(n => '<li class="biz">' + esc(n) + '</li>').concat(SUPPORTERS.map(n => '<li>' + esc(n) + '</li>'));
   ul.innerHTML = items.length ? items.join('') : '<li class="empty">Your name could be first! 💛</li>';
 })();
+
+/* ===== SPONSOR BANNER: fill this in when a business sponsors the Playground =====
+   Leave name empty to show the "Your business here" banner instead.
+   logo: an image file uploaded to this repo (e.g. "sponsor-logo.png") or a full image link. */
+const SPONSOR_BANNER = {
+  name: "",       // e.g. "Lowveld Running Shop"
+  text: "",       // one short line, e.g. "10% off for Playground runners. Show this page in store."
+  link: "",       // their website, Instagram or WhatsApp link
+  logo: ""        // optional
+};
+/* ===== SUPPORTER CODE: give this code to supporters in your thank-you message.
+   Entering it hides the sponsor banners on their device. Change it whenever you like. */
+const SUPPORTER_CODE = "HIGHFIVE";
+
+const isSupporter = () => { try { return localStorage.getItem('trp-supporter') === '1'; } catch (e) { return false; } };
+const escB = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+window.TRP_BANNER = () => {
+  if (isSupporter()) return '';
+  const b = SPONSOR_BANNER;
+  if (b.name) {
+    const out = /^https?:/.test(b.link) && !b.link.includes('runnersplayground.com');
+    return `<a class="spon" href="${escB(b.link || '#support')}"${out ? ' target="_blank" rel="noopener sponsored"' : ''}><span class="tag">Sponsor</span>${b.logo ? `<img src="${escB(b.logo)}" alt="">` : ''}<span class="txt"><b>${escB(b.name)}</b>${escB(b.text)}</span><span class="go">Visit →</span></a>`;
+  }
+  return `<a class="spon house" href="#support"><span class="tag">Your business here</span><span class="txt"><b>Put your business in front of runners</b>Running shop, physio, coffee spot? Sponsor the Playground and support local running.</span><span class="go">Let's talk →</span></a>`;
+};
+const drawBanner = () => { $('spon-slot').querySelector('.wrap').innerHTML = window.TRP_BANNER(); };
+drawBanner();
+$('sup-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const ok = $('sup-code').value.trim().toUpperCase() === SUPPORTER_CODE.toUpperCase();
+  if (ok) { try { localStorage.setItem('trp-supporter', '1'); } catch (err) {} drawBanner(); $('sup-code').value = ''; }
+  $('sup-msg').textContent = ok ? "Thank you, legend! 💛 Sponsor banners are now hidden on this device." : "Hmm, that code doesn't match. Check your thank-you message and try again.";
+});
 
 const DISTS = [[5,'5K'],[10,'10K'],[21.1,'Half'],[42.2,'Marathon']];
 
@@ -1302,6 +1352,7 @@ const openPost = (s, push) => {
    <div style="padding:0 clamp(14px,4vw,24px)"><header class="rd-head"><span class="pill" style="background:${c[1]};display:inline-block;padding:5px 14px;border:2px solid #0F2236;border-radius:999px;font-weight:900;font-size:14px">${esc(p.category || 'Tips')}</span><h1>${esc(p.title)}</h1>${p.summary ? `<p class="lead">${esc(p.summary)}</p>` : ''}<div class="post-meta">${p.author ? `<span>By ${esc(p.author)}</span><span aria-hidden="true">·</span>` : ''}${p.date ? `<span>${esc(niceDate(p.date))}</span><span aria-hidden="true">·</span>` : ''}<span>${readTime(p)}</span></div></header></div>
    <div class="rd-wrap"><article class="rd-body">${render(p.body, s)}</article>
     <div class="rd-share"><b style="font:700 22px 'Fredoka',sans-serif">Found this useful? Share it with your running crew.</b><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="rd-btn" href="${esc(wa)}" target="_blank" rel="noopener" style="background:#25D366">WhatsApp</a><button type="button" class="rd-btn" data-copy="${esc(url)}">Copy link</button></div></div>
+    ${window.TRP_BANNER ? `<div class="spon-slot">${window.TRP_BANNER()}</div>` : ''}
     ${window.TRP_NEWS ? window.TRP_NEWS('article') : ''}
     ${more.length ? `<div class="rd-more"><h2 style="font-size:30px;margin-bottom:18px">Keep reading</h2><div class="post-grid">${more.map(x => card(x, posts.indexOf(x))).join('')}</div></div>` : ''}
    </div>`;
@@ -1345,14 +1396,15 @@ if (url) fetch(url + (url.includes('?') ? '&' : '?') + 'action=posts').then(r =>
 <script>
 {
 /* ===== PAGES: each bottom-bar button shows one page ===== */
-const PAGES = { home: ['top'], tools: ['calculators'], diary: ['diary'], play: ['challenges', 'badges'], tips: ['plans', 'blog'], pro: ['pricing', 'join'] };
-const pageOf = id => { if (PAGES[id]) return id; if (/^read-/.test(id)) return 'tips'; for (const k in PAGES) if (PAGES[k].includes(id)) return k; return 'home'; };
+const PAGES = { home: ['top'], tools: ['calculators'], diary: ['diary'], play: ['challenges', 'badges'], tips: ['plans', 'blog'], support: ['pricing', 'join'] };
+const pageOf = id => { if (id === 'pro') return 'support'; if (PAGES[id]) return id; if (/^read-/.test(id)) return 'tips'; for (const k in PAGES) if (PAGES[k].includes(id)) return k; return 'home'; };
 let shown = null;
 const go = () => {
   const id = decodeURIComponent(location.hash.slice(1)), page = pageOf(id);
   document.querySelectorAll('main > section').forEach(sec => { sec.hidden = !PAGES[page].includes(sec.id); });
-  document.getElementById('join').hidden = page !== 'pro';
-  document.querySelector('footer').classList.toggle('slim', page !== 'pro');
+  document.getElementById('join').hidden = page !== 'support';
+  document.querySelector('footer').classList.toggle('slim', page !== 'support');
+  document.getElementById('spon-slot').hidden = page === 'support' || page === 'home'; /* home stays clean: greeting + race pacer only */
   document.querySelectorAll('[data-nav]').forEach(a => { if (a.dataset.nav === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   const el = !PAGES[id] && document.getElementById(id);
   if (el && PAGES[page].indexOf(id) > 0) el.scrollIntoView();
