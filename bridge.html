@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Runners Playground bridge</title>
+</head>
+<body>
+<script>
+/* =====================================================================
+   THE RUNNERS PLAYGROUND — RUN BRIDGE
+   The race pacers (pacer.runnersplayground.com) load this page invisibly
+   to borrow the runner's recent Playground Quest runs from THIS phone or
+   computer, for "Predict my time". Nothing leaves the device and only
+   our own race pacer site gets an answer.
+   ===================================================================== */
+(function () {
+  var ALLOWED = ['https://pacer.runnersplayground.com', 'https://runnersplayground.com', 'https://www.runnersplayground.com'];
+  var DAYS = 42; // only runs from the last 6 weeks
+
+  window.addEventListener('message', function (e) {
+    if (ALLOWED.indexOf(e.origin) === -1) return;
+    if (!e.data || e.data.type !== 'trp-get-runs') return;
+    var runs = [];
+    try {
+      var q = JSON.parse(localStorage.getItem('trp-quest')) || {};
+      var cutoff = new Date(Date.now() - DAYS * 864e5).toISOString().slice(0, 10);
+      runs = (q.runs || []).filter(function (r) { return r && r.t > 0 && r.km > 0 && r.d >= cutoff; })
+        .map(function (r) { return { d: r.d, km: r.km, t: r.t, e: r.e || '' }; });
+      e.source.postMessage({ type: 'trp-runs', runs: runs, hasQuest: !!q.id, total: (q.runs || []).length }, e.origin);
+    } catch (err) {
+      e.source.postMessage({ type: 'trp-runs', runs: [], error: 'storage' }, e.origin);
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -115,6 +115,11 @@ details.card .body{padding:0 26px 26px}
 .weeks{margin:0;padding-left:20px}
 .weeks li{margin-bottom:6px}
 .thumb{height:150px;overflow:hidden;border-bottom:var(--line);display:flex;align-items:center;justify-content:center;border-radius:23px 23px 0 0}
+/* quest teaser on the Play page */
+.quest-card{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:24px;align-items:center;background:#fff;border:var(--line);border-radius:26px;padding:22px;box-shadow:7px 7px 0 var(--ink);text-decoration:none;color:var(--ink)}
+.quest-card svg{width:100%;height:auto;border:var(--line);border-radius:18px}
+.quest-card:hover{transform:translate(-2px,-2px)}
+@media(max-width:620px){.quest-card{grid-template-columns:1fr}}
 /* support page: supporters + sponsors */
 .workshop{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:center}
 .workshop h2 mark{background:var(--ye);color:var(--ink);padding:0 10px;border:var(--line);border-radius:16px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
@@ -568,6 +573,20 @@ body.reading{overflow:hidden}
     <a class="btn dark" data-link="runDiary" href="#">Find a running buddy</a>
    </div>
   </div>
+ </div>
+</section>
+
+<section id="quest" class="band" style="background:var(--ye)">
+ <div class="wrap">
+  <a class="quest-card" href="quest.html">
+   <svg viewBox="0 0 220 140" aria-hidden="true"><rect width="220" height="140" rx="18" fill="#9BE3DA"/><path d="M20 112 C70 130 110 92 150 104 S210 96 196 58 S120 30 90 50 S30 50 40 24" fill="none" stroke="#FFE9A8" stroke-width="26" stroke-linecap="round"/><path d="M20 112 C70 130 110 92 150 104 S210 96 196 58 S120 30 90 50 S30 50 40 24" fill="none" stroke="#0F2236" stroke-width="5" stroke-linecap="round"/><path d="M20 112 C70 130 110 92 150 104" fill="none" stroke="#FF5C8A" stroke-width="5" stroke-linecap="round"/><circle cx="150" cy="104" r="12" fill="#FF5C8A" stroke="#0F2236" stroke-width="3"/><path d="M32 30v-12h4v4h3v-4h4v4h3v-4h4v12z" fill="#FFD23F" stroke="#0F2236" stroke-width="2.5"/><rect x="94" y="94" width="12" height="12" rx="3" transform="rotate(45 100 100)" fill="#fff" stroke="#0F2236" stroke-width="2.5"/><rect x="172" y="60" width="12" height="12" rx="3" transform="rotate(45 178 66)" fill="#FF5C8A" stroke="#0F2236" stroke-width="2.5"/></svg>
+   <div>
+    <span class="eyebrow" style="color:var(--ink)">New game</span>
+    <h2 style="margin:4px 0 8px">Playground Quest</h2>
+    <p style="margin:0 0 14px;font-weight:700">Every km you run moves your runner across the Playground Isles. Collect 12 pieces of armour, visit 14 tiny towns and race your club to Playground Palace.</p>
+    <span class="btn dark">Start my quest →</span>
+   </div>
+  </a>
  </div>
 </section>
 
@@ -1396,7 +1415,7 @@ if (url) fetch(url + (url.includes('?') ? '&' : '?') + 'action=posts').then(r =>
 <script>
 {
 /* ===== PAGES: each bottom-bar button shows one page ===== */
-const PAGES = { home: ['top'], tools: ['calculators'], diary: ['diary'], play: ['challenges', 'badges'], tips: ['plans', 'blog'], support: ['pricing', 'join'] };
+const PAGES = { home: ['top'], tools: ['calculators'], diary: ['diary'], play: ['quest', 'challenges', 'badges'], tips: ['plans', 'blog'], support: ['pricing', 'join'] };
 const pageOf = id => { if (id === 'pro') return 'support'; if (PAGES[id]) return id; if (/^read-/.test(id)) return 'tips'; for (const k in PAGES) if (PAGES[k].includes(id)) return k; return 'home'; };
 let shown = null;
 const go = () => {

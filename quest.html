@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground Quest · The Runners Playground</title>
+<meta name="description" content="Every kilometre you run moves your runner across the Playground Isles. Collect armour, reach Playground Palace and climb the club leaderboard.">
+<link rel="icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--tq:#2EC4B6;--tq-l:#E6FAF8;--tq-d:#0B7A70;--ye:#FFD23F;--ye-l:#FFF6D1;--pk:#FF5C8A;--pk-l:#FFE3EC;--pk-d:#B0204F;--ink:#0F2236;--slate:#3D4F63;--mist:#CFE3F2;--line:3px solid var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;background:#F3FBFA;color:var(--ink);font:16px/1.5 'Nunito',system-ui,sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--ink)}
+:focus-visible{outline:3px solid var(--pk);outline-offset:2px}
+h1,h2,h3{font-family:'Fredoka',sans-serif;line-height:1.1;margin:0 0 10px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.nav{background:#fff;border-bottom:var(--line)}
+.nav .in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 18px/1.05 'Fredoka',sans-serif}
+.logo span span{color:var(--pk)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:10px 20px;border:var(--line);border-radius:999px;background:#fff;font-weight:800;text-decoration:none;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.sm{min-height:38px;padding:6px 14px;font-size:14px}
+.btn.ye{background:var(--ye)}.btn.pk{background:var(--pk)}.btn.dark{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--ye)}
+.hero{background:var(--tq);border-bottom:var(--line)}
+.hero .in{max-width:1180px;margin:0 auto;padding:26px 16px 22px}
+.hero h1{font-size:clamp(34px,6vw,54px)}
+.hero p{margin:0;font-weight:700;max-width:620px}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 60px;display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:960px){main{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start}#map-card{grid-column:1;grid-row:1}#me-card{grid-column:2;grid-row:1}#log-card{grid-column:2;grid-row:2 / span 2}#gear-card{grid-column:1;grid-row:2}#lb-card{grid-column:1;grid-row:3}}
+.card{background:#fff;border:var(--line);border-radius:24px;padding:18px;box-shadow:6px 6px 0 var(--ink);min-width:0}
+.card h2{font-size:24px}
+.muted{color:var(--slate);font-size:14px}
+.field{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:14px}
+.field input,.field select,select.plain{min-height:46px;padding:8px 12px;border:var(--line);border-radius:14px;background:#fff;font-weight:700;font-size:16px;width:100%}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.row .field{flex:1 1 130px}
+/* map */
+.map{border:var(--line);border-radius:20px;overflow:auto hidden;background:#9BE3DA;-webkit-overflow-scrolling:touch}
+.map svg{display:block;width:100%;height:auto}
+@media(max-width:700px){.map svg{width:720px;max-width:none}}
+.map-hint{display:none;font-size:13px;font-weight:800;color:var(--slate);margin:6px 0 0}
+@media(max-width:700px){.map-hint{display:block}}
+.town text,.lbl{font:800 22px 'Nunito',sans-serif;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+#runner{transition:transform 1.2s cubic-bezier(.4,1.4,.6,1)}
+@media (prefers-reduced-motion:reduce){#runner{transition:none}}
+.wave{animation:wave 6s ease-in-out infinite}
+@keyframes wave{50%{transform:translateX(12px)}}
+@media (prefers-reduced-motion:reduce){.wave{animation:none}}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:13px;font-weight:800;color:var(--slate)}
+.legend i{display:inline-block;width:14px;height:14px;border:2px solid var(--ink);border-radius:50%;vertical-align:-2px;margin-right:4px}
+/* runner card */
+.me{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stats div{background:var(--ink);color:#fff;border-radius:14px;padding:8px 10px}
+.stats b{display:block;font:700 22px 'Fredoka',sans-serif;color:var(--ye);white-space:nowrap}
+.stats span{font-size:12px;font-weight:700;color:var(--mist)}
+.next{margin-top:12px;background:var(--ye-l);border:2px solid var(--ink);border-radius:14px;padding:10px 12px;font-weight:800}
+.bar{height:14px;border:2px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--pk);width:0;transition:width 1s}
+/* armour */
+.gear{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px;margin-top:6px}
+.gear div{border:2px solid var(--ink);border-radius:14px;padding:8px;text-align:center;font-size:12px;font-weight:800;background:#fff;line-height:1.25}
+.gear div.got{background:var(--ye)}
+.gear div.locked{border-style:dashed;color:var(--slate);background:#F7FAFC}
+.gear .ic{font-size:24px;display:block}
+/* log */
+.runs{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.runs li{display:flex;justify-content:space-between;align-items:center;gap:8px;border:2px solid var(--mist);border-radius:12px;padding:6px 10px;font-weight:700}
+.runs button{border:0;background:none;color:var(--pk-d);font-weight:800;cursor:pointer;text-decoration:underline}
+.msg{font-weight:800;margin:10px 0 0;min-height:1.5em}
+.tip{margin:10px 0 0;background:var(--tq-l);border:2px solid var(--ink);border-radius:14px;padding:8px 12px;font-size:14px;font-weight:700}
+.msg.err{color:var(--pk-d)}
+/* leaderboard */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:2px solid var(--mist);font-size:15px}
+th{font:700 15px 'Fredoka',sans-serif;background:var(--tq-l)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.mine td{background:var(--ye-l);font-weight:900}
+.ex{display:inline-block;margin-left:6px;padding:0 7px;border:1.5px solid var(--slate);border-radius:999px;font-size:11px;font-weight:800;color:var(--slate)}
+/* toast */
+.toasts{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:grid;gap:8px;z-index:50;width:min(92vw,440px)}
+.toast{background:var(--ink);color:#fff;border:3px solid var(--ye);border-radius:18px;padding:12px 16px;font-weight:800;box-shadow:4px 4px 0 var(--pk);animation:pop .4s ease-out}
+@keyframes pop{from{transform:translateY(20px);opacity:0}}
+footer{background:var(--ink);color:#CFE3F2;font-size:14px}
+footer .in{max-width:1180px;margin:0 auto;padding:20px 16px}
+footer a{color:#fff}
+</style>
+</head>
+<body>
+<div class="nav"><div class="in">
+ <a class="logo" href="/" aria-label="The Runners Playground home">
+  <svg width="40" height="40" viewBox="0 0 44 44" aria-hidden="true"><rect x="3" y="9" width="38" height="26" rx="13" fill="none" stroke="#2EC4B6" stroke-width="5"/><rect x="11" y="16" width="22" height="12" rx="6" fill="#FFD23F" stroke="#0F2236" stroke-width="2.5"/><circle cx="34" cy="10" r="5" fill="#FF5C8A" stroke="#0F2236" stroke-width="2.5"/></svg>
+  <span>The Runners<br><span>Playground</span></span>
+ </a>
+ <a class="btn sm ye" href="/#play">← Play page</a>
+</div></div>
+
+<div class="hero"><div class="in">
+ <h1>Playground Quest</h1>
+ <p>Every kilometre you run moves your runner across the Playground Isles. Pick up armour on the road, visit 14 tiny towns and race your club to Playground Palace.</p>
+</div></div>
+
+<main>
+ <!-- MAP -->
+ <section class="card" id="map-card" aria-labelledby="map-h">
+  <h2 id="map-h">The Playground Isles</h2>
+  <div class="map" id="map-wrap"><svg id="map" viewBox="0 0 1000 720" role="img" aria-label="Map of the Playground Isles with your runner's position"></svg></div>
+  <p class="map-hint">↔ Swipe the map to look around</p>
+  <div class="legend"><span><i style="background:#FFD23F"></i>town</span><span><i style="background:#FF5C8A;border-radius:4px"></i>armour to find</span><span><i style="background:#fff;border-radius:4px"></i>armour collected</span><span id="lap-note"></span></div>
+ </section>
+
+ <!-- RUNNER / START -->
+ <section class="card" id="me-card" aria-labelledby="me-h">
+  <div id="start" hidden>
+   <h2 id="me-h">Create your runner</h2>
+   <p class="muted" style="margin-top:0">Your runner name and club show on the public leaderboard. A first name or nickname is perfect.</p>
+   <form id="start-form" novalidate>
+    <div class="row">
+     <label class="field">Runner name<input id="s-name" maxlength="30" autocomplete="nickname" required placeholder="e.g. Speedy Thandi"></label>
+     <label class="field">Club or group (optional)<input id="s-club" maxlength="40" list="club-list" placeholder="e.g. your running club"></label>
+    </div>
+    <button class="btn pk" type="submit" style="margin-top:12px">Start my quest</button>
+    <p class="msg err" id="s-msg" aria-live="polite"></p>
+   </form>
+  </div>
+  <div id="me" hidden>
+   <div class="me">
+    <svg id="avatar" viewBox="0 0 160 200" role="img" aria-label="Your runner and the armour they wear"></svg>
+    <div>
+     <h2 style="margin-bottom:2px" id="me-name">–</h2>
+     <p class="muted" style="margin:0 0 10px"><span id="me-club"></span> · <button type="button" id="edit" style="border:0;background:none;padding:0;font-weight:800;text-decoration:underline;cursor:pointer;color:var(--slate)">edit</button></p>
+     <div class="stats">
+      <div><b id="st-km">0</b><span>km run</span></div>
+      <div><b id="st-power">0</b><span>armour power</span></div>
+      <div><b id="st-pos">0</b><span id="st-pos2">km of 200 · lap 1</span></div>
+      <div><b id="st-towns">0/14</b><span>towns visited</span></div>
+     </div>
+    </div>
+   </div>
+   <div class="next" id="next">–<div class="bar"><i id="next-bar"></i></div></div>
+  </div>
+ </section>
+
+ <!-- LOG A RUN -->
+ <section class="card" id="log-card" aria-labelledby="log-h">
+  <h2 id="log-h">Log a run</h2>
+  <form id="log-form" novalidate>
+   <div class="row">
+    <label class="field">Distance (km)<input id="l-km" inputmode="decimal" placeholder="e.g. 6.5" autocomplete="off"></label>
+    <label class="field">Date<input id="l-date" type="date"></label>
+   </div>
+   <div class="row" style="margin-top:10px">
+    <label class="field">Time · optional<input id="l-time" inputmode="numeric" placeholder="e.g. 38:20" autocomplete="off"></label>
+    <label class="field">Effort · optional<select id="l-eff"><option value="">–</option><option value="easy">Easy</option><option value="steady">Steady</option><option value="hard">Hard</option><option value="race">Race / time trial</option></select></label>
+   </div>
+   <p class="tip">⏱️ Add your time and effort, and the race pacers can use your recent runs to predict your next race time. These stay on your phone.</p>
+   <button class="btn pk" type="submit" style="margin-top:12px" id="l-go">Move my runner</button>
+   <p class="msg" id="l-msg" aria-live="polite"></p>
+  </form>
+  <p class="muted" style="margin:4px 0 0">Honour system: log the runs (or walks) you really did. 0.5 to 100 km per run, up to 120 km a day.</p>
+  <ul class="runs" id="runs"></ul>
+ </section>
+
+ <!-- ARMOUR -->
+ <section class="card" id="gear-card" aria-labelledby="gear-h">
+  <h2 id="gear-h">Armour</h2>
+  <p class="muted" style="margin:0">Pieces lie on the road. Run past one and it's yours for good.</p>
+  <div class="gear" id="gear"></div>
+ </section>
+
+ <!-- LEADERBOARD -->
+ <section class="card" id="lb-card" aria-labelledby="lb-h">
+  <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+   <h2 id="lb-h" style="margin:0">Leaderboard</h2>
+   <div class="row" style="align-items:center">
+    <label class="sr-only" for="lb-club">Show club</label>
+    <select id="lb-club" class="plain" style="width:auto"><option value="">All clubs</option></select>
+    <button type="button" class="btn sm" id="lb-refresh">Refresh</button>
+   </div>
+  </div>
+  <div style="overflow-x:auto"><table>
+   <thead><tr><th>#</th><th>Runner</th><th>Club</th><th class="n">km</th><th class="n">Armour</th></tr></thead>
+   <tbody id="lb-body"></tbody>
+  </table></div>
+  <p class="muted" id="lb-note" style="margin:10px 0 0"></p>
+ </section>
+</main>
+<datalist id="club-list"></datalist>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<footer><div class="in">© 2026 The Runners Playground. All rights reserved. · <a href="/">Home</a> · <a href="privacy.html">Privacy policy</a></div></footer>
+
+<script>
+{
+/* ===== QUEST LEADERBOARD: paste your Quest.gs web app URL between the quotes =====
+   Until it's filled in, the leaderboard shows labelled example runners. */
+const QUEST_URL = "";
+
+const ROAD = 200;
+const TOWNS = [
+  { km: 8, name: 'Sockington' }, { km: 18, name: 'Puddle Hop' }, { km: 30, name: 'Pancake Pass', lab: 'down' },
+  { km: 42.2, name: 'Marathon Meadows', lab: 'up', anchor: 'end', dx: -22 }, { km: 55, name: 'Gel Pack Grove' }, { km: 68, name: 'Bananaville' },
+  { km: 82, name: 'Huff & Puff Hill' }, { km: 92, name: 'Splash Lagoon' }, { km: 100, name: 'Century Castle' },
+  { km: 120, name: 'Tailwind Towers' }, { km: 140, name: 'Second Wind Springs' }, { km: 160, name: 'Cadence Cove' },
+  { km: 180, name: 'Medal Mountain' }, { km: 200, name: 'Playground Palace' }
+];
+const GEAR = [
+  { km: 3, id: 'band', name: 'Sweatband of Swiftness', p: 1, ic: '🎽' },
+  { km: 12, id: 'socks', name: 'Socks of Comfort', p: 1, ic: '🧦' },
+  { km: 25, id: 'gloves', name: 'Gloves of Grip', p: 2, ic: '🧤' },
+  { km: 38, id: 'cap', name: 'Cap of Cool', p: 2, ic: '🧢' },
+  { km: 50, id: 'shades', name: 'Shades of Sunshine', p: 2, ic: '🕶️' },
+  { km: 64, id: 'belt', name: 'Bottle Belt of Hydration', p: 3, ic: '🥤' },
+  { km: 77, id: 'knees', name: 'Knee Guards of Bounce', p: 3, ic: '🦵' },
+  { km: 95, id: 'shoes', name: 'Shoes of Spring', p: 4, ic: '👟' },
+  { km: 115, id: 'shield', name: 'Shield of Second Wind', p: 4, ic: '🛡️' },
+  { km: 135, id: 'cape', name: 'Cape of Tailwind', p: 5, ic: '🦸' },
+  { km: 155, id: 'helmet', name: 'Helmet of Hills', p: 5, ic: '⛑️' },
+  { km: 180, id: 'mail', name: 'Golden Medal Mail', p: 6, ic: '🥇' }
+];
+const EXAMPLES = [
+  { name: 'Speedy Thandi', club: 'Example Harriers', km: 164.5, gear: 10 },
+  { name: 'Pieter V.', club: 'Example Harriers', km: 121, gear: 9 },
+  { name: 'Lerato', club: 'Sunrise Joggers', km: 88.2, gear: 7 },
+  { name: 'Coach Sam', club: 'Sunrise Joggers', km: 47, gear: 4 },
+  { name: 'Nomsa M.', club: '', km: 19.5, gear: 2 }
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const r1 = n => Math.round(n * 10) / 10;
+const fmtKm = n => String(Math.round(n * 10) / 10);
+const readTime = raw => { const v = String(raw || '').trim().replace(/[hms ]+/g, ':').replace(/:+$/, ''); if (/^\d+(\.\d+)?$/.test(v)) return Math.round(+v * 60) || null; const p = v.split(':').map(Number); if (p.some(n => isNaN(n) || n < 0)) return null; const s = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p.length === 2 ? p[0] * 60 + p[1] : null; return s > 0 ? s : null; };
+const fmtT = s => { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = Math.round(s % 60); return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+const EFF = { easy: 'easy', steady: 'steady', hard: 'hard', race: 'race' };
+const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(new Date());
+const KEY = 'trp-quest';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(Q)); } catch (e) {} };
+let Q = load();
+
+const total = () => r1((Q ? Q.runs : []).reduce((a, r) => a + r.km, 0));
+const gearAt = km => GEAR.filter(g => km >= g.km);           // armour stays yours after lap 1
+const power = km => gearAt(km).reduce((a, g) => a + g.p, 0);
+const lap = km => Math.floor(km / ROAD) + 1;
+const pos = km => { const p = km % ROAD; return km > 0 && p === 0 ? ROAD : p; };
+const townsSeen = km => km >= ROAD ? TOWNS.length : TOWNS.filter(t => km >= t.km).length;
+
+/* ---------- map ---------- */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const ROUTE = 'M 70 640 C 260 690, 470 600, 680 640 S 960 620, 915 520 S 640 450, 470 490 S 110 500, 120 395 S 360 300, 560 335 S 935 335, 900 235 S 650 160, 470 190 S 150 205, 165 110 S 420 40, 600 70 S 860 120, 905 70';
+const map = $('map');
+map.innerHTML = `
+  <defs><pattern id="sea" width="60" height="30" patternUnits="userSpaceOnUse"><path d="M0 15 q15 -8 30 0 t30 0" fill="none" stroke="#7FD6CB" stroke-width="3"/></pattern></defs>
+  <rect width="1000" height="720" fill="#9BE3DA"/>
+  <rect class="wave" x="-30" width="1060" height="720" fill="url(#sea)"/>
+  <path d="${ROUTE}" fill="none" stroke="#0F2236" stroke-width="96" stroke-linecap="round" stroke-dasharray="300 70" opacity=".9"/>
+  <path d="${ROUTE}" fill="none" stroke="#FFE9A8" stroke-width="88" stroke-linecap="round" stroke-dasharray="300 70"/>
+  <path d="${ROUTE}" fill="none" stroke="#B8E986" stroke-width="58" stroke-linecap="round" stroke-dasharray="300 70" opacity=".9"/>
+  <path id="road" d="${ROUTE}" fill="none" stroke="#0F2236" stroke-width="14" stroke-linecap="round"/>
+  <path d="${ROUTE}" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 12"/>
+  <path id="done" d="${ROUTE}" fill="none" stroke="#FF5C8A" stroke-width="8" stroke-linecap="round"/>
+  <g id="pins"></g><g id="runner"></g>`;
+const road = $('road'), L = road.getTotalLength();
+const at = km => road.getPointAtLength(L * Math.max(0, Math.min(ROAD, km)) / ROAD);
+const castle = (x, y, big) => `<g transform="translate(${x} ${y}) scale(${big ? 1.5 : 1})"><path d="M-14 8v-18h6v6h5v-6h6v6h5v-6h6v18z" fill="#FFD23F" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/><path d="M-3 8v-7h6v7" fill="#0F2236"/>${big ? '<path d="M0 -10v-14l12 5-12 5" fill="#FF5C8A" stroke="#0F2236" stroke-width="2"/>' : ''}</g>`;
+const house = (x, y) => `<g transform="translate(${x} ${y})"><path d="M-12 8v-12l12-10 12 10v12z" fill="#FFD23F" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/><rect x="-3" y="0" width="6" height="8" fill="#0F2236"/></g>`;
+const drawPins = () => {
+  const km = total(), here = pos(km), lapsDone = km >= ROAD;
+  let h = '';
+  const s = at(0); h += `<g transform="translate(${s.x} ${s.y})"><circle r="16" fill="#fff" stroke="#0F2236" stroke-width="3"/><text y="7" text-anchor="middle" font-size="18">🏁</text></g><text class="lbl" x="${s.x - 40}" y="${s.y + 50}" style="font-size:20px">Shoelace Bay</text>`;
+  GEAR.forEach(g => {
+    const p = at(g.km), got = km >= g.km;
+    h += `<g transform="translate(${p.x} ${p.y})"><rect x="-13" y="-13" width="26" height="26" rx="7" transform="rotate(45)" fill="${got ? '#fff' : '#FF5C8A'}" stroke="#0F2236" stroke-width="3"/><text y="6" text-anchor="middle" font-size="15">${got ? '✓' : ''}</text><title>${esc(g.name)} · km ${g.km}</title></g>`;
+  });
+  TOWNS.forEach((t, i) => {
+    const p = at(t.km), big = t.km === 100 || t.km === ROAD, up = t.lab ? t.lab === 'up' : i % 2 === 0, tx = p.x + (t.dx || 0);
+    h += `<g class="town">${big ? castle(p.x, p.y - 4, true) : house(p.x, p.y - 2)}<text x="${Math.max(10, Math.min(990, tx))}" y="${p.y + (up ? -26 : 44) + (big && up ? -14 : 0)}" text-anchor="${t.anchor || (p.x < 120 ? 'start' : p.x > 880 ? 'end' : 'middle')}">${esc(t.name)}</text><title>${esc(t.name)} · km ${t.km}</title></g>`;
+  });
+  $('pins').innerHTML = h;
+  const done = $('done');
+  done.style.strokeDasharray = L; done.style.strokeDashoffset = L - L * (lapsDone && here === ROAD ? 1 : here) / ROAD;
+  const p = at(here);
+  $('runner').innerHTML = `<circle r="24" fill="#FF5C8A" stroke="#0F2236" stroke-width="4"/><text y="9" text-anchor="middle" font-size="26">🏃</text>`;
+  $('runner').style.transform = `translate(${p.x}px, ${p.y}px)`;
+  const w = $('map-wrap'); if (w.scrollWidth > w.clientWidth) w.scrollLeft = Math.max(0, p.x / 1000 * w.scrollWidth - w.clientWidth / 2);
+  $('lap-note').textContent = Q ? 'You: lap ' + lap(km) + (lap(km) > 1 ? ' (armour kept from lap 1)' : '') : '';
+};
+
+/* ---------- avatar ---------- */
+const drawAvatar = () => {
+  const has = new Set(gearAt(total()).map(g => g.id));
+  const on = id => has.has(id);
+  $('avatar').innerHTML = `
+   <ellipse cx="80" cy="192" rx="48" ry="6" fill="#0F2236" opacity=".15"/>
+   ${on('cape') ? '<path d="M58 70 L30 160 Q80 150 108 150 L102 70z" fill="#FF5C8A" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/>' : ''}
+   <path d="M70 118 L56 150 L44 176" fill="none" stroke="#0F2236" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+   <path d="M90 118 L104 146 L126 160" fill="none" stroke="#0F2236" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+   ${on('knees') ? '<circle cx="56" cy="150" r="8" fill="#FF5C8A" stroke="#0F2236" stroke-width="3"/><circle cx="104" cy="146" r="8" fill="#FF5C8A" stroke="#0F2236" stroke-width="3"/>' : ''}
+   ${on('socks') ? '<path d="M46 170l-4 8M122 156l7 6" stroke="#fff" stroke-width="12" stroke-linecap="round"/>' : ''}
+   <path d="M34 180h20l4 6H34z" fill="${on('shoes') ? '#FF5C8A' : '#3D4F63'}" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/>
+   <path d="M122 158l16 6-2 7-17-6z" fill="${on('shoes') ? '#FF5C8A' : '#3D4F63'}" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/>
+   ${on('shoes') ? '<path d="M38 188l3 5 3-5 3 5 3-5" fill="none" stroke="#0F2236" stroke-width="2"/>' : ''}
+   <rect x="58" y="64" width="44" height="60" rx="18" fill="${on('mail') ? '#FFD23F' : '#2EC4B6'}" stroke="#0F2236" stroke-width="4"/>
+   ${on('mail') ? '<path d="M66 80h28M66 92h28M66 104h28" stroke="#B88A00" stroke-width="3"/><circle cx="80" cy="96" r="7" fill="#fff" stroke="#0F2236" stroke-width="3"/>' : ''}
+   ${on('belt') ? '<rect x="56" y="108" width="48" height="8" rx="3" fill="#0F2236"/><rect x="96" y="100" width="10" height="18" rx="3" fill="#2EC4B6" stroke="#0F2236" stroke-width="2.5"/>' : ''}
+   <path d="M62 78 L40 100 L52 116" fill="none" stroke="#0F2236" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+   <path d="M98 78 L120 92 L132 74" fill="none" stroke="#0F2236" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+   ${on('gloves') ? '<circle cx="52" cy="117" r="7" fill="#FFD23F" stroke="#0F2236" stroke-width="3"/><circle cx="132" cy="73" r="7" fill="#FFD23F" stroke="#0F2236" stroke-width="3"/>' : ''}
+   ${on('shield') ? '<path d="M28 96 q14-8 26 0 v14 q-2 14-13 20 q-11-6-13-20z" fill="#fff" stroke="#0F2236" stroke-width="3" stroke-linejoin="round"/><path d="M41 100v24M32 108h18" stroke="#FF5C8A" stroke-width="4"/>' : ''}
+   <circle cx="80" cy="40" r="22" fill="#FFE0C2" stroke="#0F2236" stroke-width="4"/>
+   <circle cx="73" cy="40" r="2.6" fill="#0F2236"/><circle cx="88" cy="40" r="2.6" fill="#0F2236"/>
+   <path d="M73 50q7 6 14 0" fill="none" stroke="#0F2236" stroke-width="3" stroke-linecap="round"/>
+   ${on('shades') ? '<path d="M64 37h32" stroke="#0F2236" stroke-width="3"/><rect x="65" y="34" width="13" height="10" rx="4" fill="#0F2236"/><rect x="82" y="34" width="13" height="10" rx="4" fill="#0F2236"/>' : ''}
+   ${on('band') && !on('helmet') ? '<path d="M59 30q21-8 42 0" fill="none" stroke="#FF5C8A" stroke-width="7" stroke-linecap="round"/>' : ''}
+   ${on('helmet') ? '<path d="M56 34 q2-26 24-26 q22 0 24 26z" fill="#FFD23F" stroke="#0F2236" stroke-width="4" stroke-linejoin="round"/><path d="M80 8v26" stroke="#FF5C8A" stroke-width="4"/>' : on('cap') ? '<path d="M58 30 q2-20 22-20 q20 0 22 20z" fill="#2EC4B6" stroke="#0F2236" stroke-width="4" stroke-linejoin="round"/><path d="M98 28h20" stroke="#0F2236" stroke-width="5" stroke-linecap="round"/>' : ''}`;
+};
+
+/* ---------- panels ---------- */
+const drawMe = () => {
+  $('start').hidden = !!Q; $('me').hidden = !Q;
+  $('log-form').querySelectorAll('input,button').forEach(x => { x.disabled = !Q; });
+  if (!Q) return;
+  const km = total(), here = pos(km);
+  $('me-name').textContent = Q.name;
+  $('me-club').textContent = Q.club || 'No club';
+  $('st-km').textContent = fmtKm(km);
+  $('st-power').textContent = power(km);
+  $('st-pos').textContent = fmtKm(km === 0 ? 0 : here);
+  $('st-pos2').textContent = 'km of 200 · lap ' + lap(km);
+  $('st-towns').textContent = townsSeen(km) + '/14';
+  const lapStart = km - (km > 0 && km % ROAD === 0 ? ROAD : km % ROAD);
+  const stops = TOWNS.map(t => ({ km: lapStart + t.km, label: t.name, kind: 'town' }))
+    .concat(GEAR.filter(g => km < g.km).map(g => ({ km: g.km, label: g.name, kind: 'gear' })))
+    .filter(s => s.km > km).sort((a, b) => a.km - b.km);
+  const nx = stops[0] || { km: lapStart + ROAD * 2, label: 'Playground Palace', kind: 'town' };
+  const prev = Math.max(lapStart, ...TOWNS.map(t => lapStart + t.km).concat(GEAR.map(g => g.km)).filter(k => k <= km));
+  $('next').firstChild.textContent = (nx.kind === 'gear' ? '🛡️ Next armour: ' : '🏠 Next town: ') + nx.label + ' in ' + fmtKm(nx.km - km) + ' km';
+  $('next-bar').style.width = Math.max(3, Math.min(100, (km - prev) / Math.max(0.1, nx.km - prev) * 100)) + '%';
+};
+const drawGear = () => {
+  const km = total();
+  $('gear').innerHTML = GEAR.map(g => km >= g.km
+    ? `<div class="got"><span class="ic">${g.ic}</span>${esc(g.name)}<br>+${g.p} power</div>`
+    : `<div class="locked"><span class="ic" style="filter:grayscale(1);opacity:.45">${g.ic}</span>${esc(g.name)}<br>at km ${g.km}</div>`).join('');
+};
+const drawRuns = () => {
+  const list = Q ? Q.runs.map((r, i) => ({ ...r, i })).sort((a, b) => b.d.localeCompare(a.d) || b.i - a.i).slice(0, 8) : [];
+  $('runs').innerHTML = list.length ? list.map(r => `<li><span>${esc(new Date(r.d + 'T00:00:00').toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' }))} · <b>${fmtKm(r.km)} km</b>${r.t ? ' in ' + fmtT(r.t) : ''}${r.e ? ' · ' + EFF[r.e] : ''}</span><button type="button" data-del="${r.i}" aria-label="Remove ${fmtKm(r.km)} km run">remove</button></li>`).join('')
+    : (Q ? '<li class="muted" style="border-style:dashed">No runs yet. Log your first one above!</li>' : '');
+};
+const drawAll = () => { drawPins(); drawAvatar(); drawMe(); drawGear(); drawRuns(); };
+
+/* ---------- toasts ---------- */
+const toast = (t, ms = 4200) => { const box = $('toasts'), el = document.createElement('div'); el.className = 'toast'; el.textContent = t; box.appendChild(el); while (box.children.length > 3) box.firstElementChild.remove(); setTimeout(() => el.remove(), ms); };
+const celebrate = (a, b) => {
+  const msgs = [];
+  GEAR.forEach(g => { if (a < g.km && b >= g.km) msgs.push(`${g.ic} You found the ${g.name}! +${g.p} power`); });
+  for (let l = Math.floor(a / ROAD); l <= Math.floor(b / ROAD); l++) TOWNS.forEach(t => { const k = l * ROAD + t.km; if (a < k && b >= k) msgs.push(t.km === ROAD ? `👑 You reached Playground Palace! Lap ${l + 2} starts now.` : `🏠 Welcome to ${t.name}!`); });
+  msgs.slice(-3).forEach((m, i) => setTimeout(() => toast(m), i * 700));
+  if (!msgs.length) toast(`🏃 +${fmtKm(b - a)} km. Keep going!`, 2600);
+};
+
+/* ---------- sync with leaderboard ---------- */
+const sync = async () => {
+  if (!QUEST_URL || !Q) return;
+  const km = total();
+  try {
+    await fetch(QUEST_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', id: Q.id, name: Q.name, club: Q.club || '', km, gear: gearAt(km).length, runs: Q.runs.length }) });
+    loadBoard();
+  } catch (e) { /* offline: the next save catches up */ }
+};
+let board = [], example = false;
+const loadBoard = async () => {
+  example = !QUEST_URL;
+  if (QUEST_URL) {
+    try { const r = await fetch(QUEST_URL + (QUEST_URL.includes('?') ? '&' : '?') + 'action=board'); const j = await r.json(); board = Array.isArray(j.rows) ? j.rows : []; }
+    catch (e) { $('lb-note').textContent = "Couldn't load the leaderboard right now. Try Refresh in a moment."; }
+  } else board = EXAMPLES.slice();
+  drawBoard();
+};
+const drawBoard = () => {
+  let rows = board.slice();
+  if (Q && !rows.some(r => r.id === Q.id)) rows.push({ id: Q.id, name: Q.name, club: Q.club || '', km: total(), gear: gearAt(total()).length, me: true });
+  const clubs = [...new Set(rows.map(r => r.club).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const sel = $('lb-club'), cur = sel.value;
+  sel.innerHTML = '<option value="">All clubs</option>' + clubs.map(c => `<option${c === cur ? ' selected' : ''}>${esc(c)}</option>`).join('');
+  $('club-list').innerHTML = clubs.map(c => `<option value="${esc(c)}">`).join('');
+  if (cur) rows = rows.filter(r => r.club === cur);
+  rows.sort((a, b) => b.km - a.km);
+  $('lb-body').innerHTML = rows.length ? rows.map((r, i) => {
+    const mine = Q && (r.id === Q.id || r.me);
+    return `<tr class="${mine ? 'mine' : ''}"><td>${i + 1}</td><td>${esc(r.name)}${mine ? ' (you)' : ''}${example && !mine ? '<span class="ex">Example</span>' : ''}</td><td>${esc(r.club || '–')}</td><td class="n">${fmtKm(+r.km || 0)}</td><td class="n">${+r.gear || 0}/12</td></tr>`;
+  }).join('') : '<tr><td colspan="5">Nobody from this club yet. Be the first!</td></tr>';
+  $('lb-note').textContent = example ? 'These are example runners so you can see how it works. The live leaderboard is switching on soon.' : 'Ranked by total kilometres. Updates every time someone logs a run.';
+};
+$('lb-club').addEventListener('change', drawBoard);
+$('lb-refresh').addEventListener('click', loadBoard);
+
+/* ---------- start / edit ---------- */
+const uid = () => 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+$('start-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('s-name').value.trim().replace(/^[=+\-@]+/, ''), club = $('s-club').value.trim().replace(/^[=+\-@]+/, '');
+  if (name.length < 2) { $('s-msg').textContent = 'Give your runner a name (at least 2 letters).'; return; }
+  Q = Q ? { ...Q, name, club } : { id: uid(), name, club, runs: [] };
+  save(); drawAll(); drawBoard(); sync(); $('l-km').focus();
+  toast(`🏁 ${name} sets off from Shoelace Bay. Good luck!`);
+});
+$('edit').addEventListener('click', () => { $('s-name').value = Q.name; $('s-club').value = Q.club || ''; $('me').hidden = true; $('start').hidden = false; $('s-name').focus(); });
+
+/* ---------- log runs ---------- */
+$('l-date').value = today(); $('l-date').max = today();
+$('log-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const msg = $('l-msg'); msg.className = 'msg err';
+  const km = r1(parseFloat(String($('l-km').value).replace(',', '.'))), d = $('l-date').value || today();
+  if (!(km >= 0.5 && km <= 100)) { msg.textContent = 'Enter a distance between 0.5 and 100 km.'; return; }
+  if (d > today()) { msg.textContent = "That date is in the future. Log runs you've already done."; return; }
+  const traw = $('l-time').value.trim(), eff = $('l-eff').value;
+  const t = traw ? readTime(traw) : null;
+  if (traw && !t) { msg.textContent = 'Type your time like 38:20 or 1:05:30, or leave it empty.'; return; }
+  if (t && (t / km < 150 || t / km > 1080)) { msg.textContent = 'That time works out to an unusual pace. Check the distance and time?'; return; }
+  const day = Q.runs.filter(r => r.d === d).reduce((a, r) => a + r.km, 0);
+  if (day + km > 120) { msg.textContent = `That would be more than 120 km on one day (you've logged ${fmtKm(day)} km that day).`; return; }
+  const before = total();
+  const run = { d, km }; if (t) run.t = t; if (eff) run.e = eff;
+  Q.runs.push(run); save();
+  msg.className = 'msg'; msg.textContent = `Logged ${fmtKm(km)} km. Off you go!`;
+  $('l-km').value = ''; $('l-time').value = ''; $('l-eff').value = '';
+  drawAll(); celebrate(before, total()); drawBoard(); sync();
+});
+$('runs').addEventListener('click', e => {
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  const r = Q.runs[+b.dataset.del]; if (!r || !confirm(`Remove the ${fmtKm(r.km)} km run? Your runner moves back.`)) return;
+  Q.runs.splice(+b.dataset.del, 1); save(); drawAll(); drawBoard(); sync();
+});
+
+drawAll(); loadBoard();
+}
+</script>
+</body>
+</html>
