@@ -124,8 +124,12 @@ footer a{color:#fff}
      <label class="field">Runner name<input id="s-name" maxlength="30" autocomplete="nickname" required placeholder="e.g. Speedy Thandi"></label>
      <label class="field">Club or group (optional)<input id="s-club" maxlength="40" list="club-list" placeholder="e.g. your running club"></label>
     </div>
-    <button class="btn pk" type="submit" style="margin-top:12px">Start my quest</button>
+    <div class="row" style="margin-top:12px;align-items:center"><button class="btn pk" type="submit" id="s-go">Start my quest</button><button class="btn sm" type="button" id="s-cancel" hidden>Cancel</button></div>
     <p class="msg err" id="s-msg" aria-live="polite"></p>
+    <div id="danger" hidden style="margin-top:14px;border-top:2px dashed var(--mist);padding-top:12px">
+     <p class="muted" style="margin:0 0 8px">Want a fresh start? This deletes your runner and runs from this device and removes you from the leaderboard.</p>
+     <button class="btn sm" type="button" id="s-reset" style="background:var(--pk-l)">Start over (delete my runner)</button>
+    </div>
    </form>
   </div>
   <div id="me" hidden>
@@ -243,6 +247,7 @@ const KEY = 'trp-quest';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(Q)); } catch (e) {} };
 let Q = load();
+if (Q && !Q.key) { Q.key = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); save(); }   // runners from before keys existed
 
 const total = () => r1((Q ? Q.runs : []).reduce((a, r) => a + r.km, 0));
 const gearAt = km => GEAR.filter(g => km >= g.km);           // armour stays yours after lap 1
@@ -324,6 +329,7 @@ const drawAvatar = () => {
 /* ---------- panels ---------- */
 const drawMe = () => {
   $('start').hidden = !!Q; $('me').hidden = !Q;
+  $('me-h').textContent = 'Create your runner'; $('s-go').textContent = 'Start my quest'; $('s-cancel').hidden = true; $('danger').hidden = true;
   $('log-form').querySelectorAll('input,button').forEach(x => { x.disabled = !Q; });
   if (!Q) return;
   const km = total(), here = pos(km);
@@ -371,7 +377,7 @@ const sync = async () => {
   if (!QUEST_URL || !Q) return;
   const km = total();
   try {
-    await fetch(QUEST_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', id: Q.id, name: Q.name, club: Q.club || '', km, gear: gearAt(km).length, runs: Q.runs.length }) });
+    await fetch(QUEST_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', id: Q.id, key: Q.key, name: Q.name, club: Q.club || '', km, gear: gearAt(km).length, runs: Q.runs.length }) });
     loadBoard();
   } catch (e) { /* offline: the next save catches up */ }
 };
@@ -403,16 +409,26 @@ $('lb-club').addEventListener('change', drawBoard);
 $('lb-refresh').addEventListener('click', loadBoard);
 
 /* ---------- start / edit ---------- */
+const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join('');
 const uid = () => 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 $('start-form').addEventListener('submit', e => {
   e.preventDefault();
   const name = $('s-name').value.trim().replace(/^[=+\-@]+/, ''), club = $('s-club').value.trim().replace(/^[=+\-@]+/, '');
   if (name.length < 2) { $('s-msg').textContent = 'Give your runner a name (at least 2 letters).'; return; }
-  Q = Q ? { ...Q, name, club } : { id: uid(), name, club, runs: [] };
+  Q = Q ? { ...Q, name, club } : { id: uid(), key: newKey(), name, club, runs: [] };
+  const isNew = !Q.runs.length && !load();
   save(); drawAll(); drawBoard(); sync(); $('l-km').focus();
-  toast(`🏁 ${name} sets off from Shoelace Bay. Good luck!`);
+  toast(isNew ? `🏁 ${name} sets off from Shoelace Bay. Good luck!` : 'Your runner is updated.');
 });
-$('edit').addEventListener('click', () => { $('s-name').value = Q.name; $('s-club').value = Q.club || ''; $('me').hidden = true; $('start').hidden = false; $('s-name').focus(); });
+$('edit').addEventListener('click', () => { $('s-name').value = Q.name; $('s-club').value = Q.club || ''; $('me').hidden = true; $('start').hidden = false; $('me-h').textContent = 'Edit your runner'; $('s-go').textContent = 'Save changes'; $('s-cancel').hidden = false; $('danger').hidden = false; $('s-name').focus(); });
+$('s-cancel').addEventListener('click', () => { drawMe(); });
+$('s-reset').addEventListener('click', async () => {
+  if (!confirm('Delete your runner, all your logged runs and your leaderboard spot? This cannot be undone.')) return;
+  if (QUEST_URL) { try { await fetch(QUEST_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'delete', id: Q.id, key: Q.key }) }); } catch (e) {} }
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  Q = null; $('s-name').value = ''; $('s-club').value = ''; drawAll(); loadBoard();
+  toast('Your runner has been deleted. Create a new one whenever you like.');
+});
 
 /* ---------- log runs ---------- */
 $('l-date').value = today(); $('l-date').max = today();

@@ -149,6 +149,18 @@ footer a{color:#fff}
  <p style="margin-bottom:0">To do any of these, email <a data-contact="email" href="mailto:hello@runnersplayground.com">hello@runnersplayground.com</a>. We'll reply as soon as we can, usually within a week. We may ask you to confirm it's really you before we share or change anything.</p>
 </section>
 
+<section class="card ye" id="delete" aria-labelledby="del-h">
+ <h2 id="del-h">Delete my data now</h2>
+ <p>Want a clean slate? This button deletes everything the Playground saved on <b>this phone or computer</b> (Run Diary, Playground Quest runner and runs, reminders settings, supporter code and preferences) and removes your runner from the Playground Quest leaderboard.</p>
+ <ul>
+  <li><b>Daily nudge:</b> switch it off on the Diary page first (or block notifications for runnersplayground.com in your browser settings).</li>
+  <li><b>Race pacers and race leaderboards:</b> use "Delete my pacer data" at the bottom of any <a href="https://pacer.runnersplayground.com/">race pacer</a> page. To edit or remove just one leaderboard entry, tap "Edit" next to your name on that leaderboard.</li>
+  <li><b>Newsletter:</b> reply "unsubscribe" to any Playground Post, or email us.</li>
+ </ul>
+ <button type="button" id="wipe-all" style="min-height:46px;padding:10px 20px;border:3px solid #0F2236;border-radius:999px;background:#FF5C8A;font:800 16px 'Nunito',sans-serif;cursor:pointer;box-shadow:3px 3px 0 #0F2236">Delete my data from this device</button>
+ <p id="wipe-msg" aria-live="polite" style="font-weight:800;margin:10px 0 0"></p>
+</section>
+
 <section class="card" aria-labelledby="kids">
  <h2 id="kids">Young runners</h2>
  <p style="margin:0">Runners of all ages are welcome to use the Playground's tools. If you're under 18, please ask a parent or guardian before you join the newsletter, add your name to a leaderboard or request a route. They can contact us at any time to see or remove your details.</p>
@@ -171,6 +183,18 @@ footer a{color:#fff}
 </section>
 
 </main>
+<script>
+document.getElementById('wipe-all').addEventListener('click', async function () {
+  if (!confirm('Delete all your Runners Playground data from this device and remove your Playground Quest runner? This cannot be undone.')) return;
+  var QUEST_URL = 'https://script.google.com/macros/s/AKfycbxAIpAetYDofd4HYoep63t1tPEv9Bz1mxJ-Mm8SToAdNjP3C8GPJeh7Mcz-0WqmyRcMWA/exec';
+  try {
+    var q = JSON.parse(localStorage.getItem('trp-quest') || 'null');
+    if (q && q.id) await fetch(QUEST_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'delete', id: q.id, key: q.key || '' }) });
+  } catch (e) {}
+  try { Object.keys(localStorage).filter(function (k) { return k.indexOf('trp') === 0; }).forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  document.getElementById('wipe-msg').textContent = 'Done! Your Playground data has been deleted from this device. You can start fresh any time.';
+});
+</script>
 
 <footer><div class="in">© 2026 The Runners Playground. All rights reserved. · <a href="/">Home</a> · <a href="https://pacer.runnersplayground.com/">Race pacers</a></div></footer>
 </body>
