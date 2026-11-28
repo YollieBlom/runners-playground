@@ -695,10 +695,10 @@ body.reading{overflow:hidden}
 /* ===== YOUR LINKS: paste your own addresses between the quotes ===== */
 const LINKS = {
   runDiary:   "",  // Run Diary & Pace Matchmaker (GitHub Pages)
-  mataffin:   "https://yollieblom.github.io/race-pacer/?race=mataffin",    // Mataffin Home Run (past race)
-  kaapsehoop: "https://yollieblom.github.io/race-pacer/?race=kaapsehoop",  // Kaapsehoop 4 in 1 Marathon (past race)
-  pacer:      "https://yollieblom.github.io/race-pacer/",       // Race pacers for every race (Westvaal and more)
-  nextRace:   "https://yollieblom.github.io/race-pacer/?race=westvaal",  // big button on the home page
+  mataffin:   "https://pacer.runnersplayground.com/?race=mataffin",    // Mataffin Home Run (past race)
+  kaapsehoop: "https://pacer.runnersplayground.com/?race=kaapsehoop",  // Kaapsehoop 4 in 1 Marathon (past race)
+  pacer:      "https://pacer.runnersplayground.com/",       // Race pacers for every race (Westvaal and more)
+  nextRace:   "https://pacer.runnersplayground.com/?race=westvaal",  // big button on the home page
   signup:     "",  // Google Form for sign-ups / Pro waitlist
   clubs:      "",  // Google Form or WhatsApp link for clubs
   supportMonthly: "",  // payment link for R10 a month (e.g. Paystack payment page or SnapScan)
@@ -708,7 +708,7 @@ const LINKS = {
 };
 document.querySelectorAll('[data-link]').forEach(a => {
   const url = LINKS[a.dataset.link];
-  if (url) { a.href = url; if (!url.includes('yollieblom.github.io')) { a.target = '_blank'; a.rel = 'noopener'; } }
+  if (url) { a.href = url; if (!url.includes('runnersplayground.com')) { a.target = '_blank'; a.rel = 'noopener'; } }
   else a.addEventListener('click', e => { e.preventDefault(); a.textContent = /^support/.test(a.dataset.link) ? 'Opening very soon!' : 'Link coming soon'; });
 });
 
@@ -1378,7 +1378,7 @@ if (r && r.name) {
 <script>
 {
 /* ===== DAILY NUDGE: opt-in push reminders to log today's run =====
-   1. Make a free OneSignal app (Web, "Custom Code"), site URL https://yollieblom.github.io
+   1. Make a free OneSignal app (Web, "Custom Code"), site URL https://runnersplayground.com
    2. Paste its App ID between the quotes below and upload index.html.
    The reminders are sent by the separate Reminders.gs Apps Script (see README). */
 const ONESIGNAL_APP_ID = "";
@@ -1415,7 +1415,7 @@ const sdk = () => ready || (ready = new Promise((res, rej) => {
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async OS => {
     try {
-      await OS.init({ appId: ONESIGNAL_APP_ID, serviceWorkerPath: 'runners-playground/push/onesignal/OneSignalSDKWorker.js', serviceWorkerParam: { scope: '/runners-playground/push/onesignal/' } });
+      await OS.init({ appId: ONESIGNAL_APP_ID, serviceWorkerPath: 'push/onesignal/OneSignalSDKWorker.js', serviceWorkerParam: { scope: '/push/onesignal/' } });
       res(OS);
     } catch (e) { rej(e); }
   });
